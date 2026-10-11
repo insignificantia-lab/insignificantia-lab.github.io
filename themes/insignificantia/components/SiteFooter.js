@@ -1,9 +1,11 @@
+import CONFIG from '../config'
+
 const SiteFooter = () => {
   return (
-    <footer className='ins-footer'>
+    <footer className='ins-site-footer'>
       <div className='ins-footer-inner'>
-        <span>Insignificantia.</span>
-        <span>Powered by NotionNext · Hosted on GitHub Pages</span>
+        <strong>{CONFIG.INSIGNIFICANTIA_SITE_NAME}</strong>
+        <span>© 2026 · Hosted with GitHub Pages</span>
       </div>
     </footer>
   )

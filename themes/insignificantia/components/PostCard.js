@@ -8,20 +8,15 @@ const normalizeTag = tag => {
 
 const getPrimaryTag = post => {
   if (post?.category) {
-    if (Array.isArray(post.category)) {
-      return normalizeTag(post.category[0])
-    }
+    if (Array.isArray(post.category)) return normalizeTag(post.category[0])
     return normalizeTag(post.category)
   }
-
   if (Array.isArray(post?.tagItems) && post.tagItems.length > 0) {
     return normalizeTag(post.tagItems[0])
   }
-
   if (Array.isArray(post?.tags) && post.tags.length > 0) {
     return normalizeTag(post.tags[0])
   }
-
   return 'NOTE'
 }
 
@@ -33,17 +28,24 @@ const getHref = post => {
 
 const PostCard = ({ post }) => {
   const href = getHref(post)
+  const title = post?.title || 'Untitled'
 
   return (
-    <Link href={href} className='ins-post-card'>
+    <Link
+      href={href}
+      className='ins-post-card'
+      aria-label={`阅读：${title}`}>
       <div className='ins-post-meta'>
-        <span className='ins-post-tag'>{getPrimaryTag(post)}</span>
+        <span className='ins-primary-tag'>{getPrimaryTag(post)}</span>
         <span>{post?.publishDay || post?.date || ''}</span>
       </div>
 
-      <h2>{post?.title || 'Untitled'}</h2>
-
+      <h2>{title}</h2>
       {post?.summary && <p>{post.summary}</p>}
+
+      <div className='ins-post-card-footer'>
+        <span className='ins-continue-reading'>继续阅读</span>
+      </div>
     </Link>
   )
 }

@@ -7,15 +7,11 @@ import SiteFooter from './components/SiteFooter'
 import HomePage from './components/HomePage'
 
 /**
- * Insignificantia. V1
+ * Insignificantia. Home V1.1
  *
- * V1 只正式接管：
- * - 全站 Header / Footer
- * - 首页 Hero
- * - 首页最新 12 篇文章
- *
- * 其它页面暂时继续使用 example theme 的布局，
- * 这样可以先验证首页视觉和真实 Notion 数据，不一次改动所有页面。
+ * 首页视觉基线严格按照已确认 index.html 重建。
+ * V1.1 正式接管：Header / Home Hero / Home latest-post cards / Footer。
+ * 其它页面仍暂时 fallback 到 example theme，后续逐页替换。
  */
 const LayoutBase = props => {
   return (
@@ -29,12 +25,7 @@ const LayoutBase = props => {
   )
 }
 
-const LayoutIndex = props => {
-  return <HomePage {...props} />
-}
-
-// V1 临时 fallback：非首页页面继续使用 example theme。
-// 后续 ARTICLE / ARCHIVE / ARTICLE DETAIL / ABOUT 会逐个替换。
+const LayoutIndex = props => <HomePage {...props} />
 const EmptyLayout = () => <></>
 
 const LayoutPostList = ExampleTheme.LayoutPostList || EmptyLayout

@@ -1,41 +1,36 @@
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import CONFIG from '../config'
 
 const SiteHeader = () => {
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    const close = () => setOpen(false)
-    window.addEventListener('resize', close)
-    return () => window.removeEventListener('resize', close)
-  }, [])
-
   return (
-    <header className='ins-header'>
-      <div className='ins-header-inner'>
-        <Link href='/' className='ins-brand' aria-label='返回首页'>
-          Insignificantia.
+    <header className='ins-site-header'>
+      <div className='ins-nav-inner'>
+        <Link className='ins-brand' href='/' aria-label='Insignificantia. Home'>
+          {CONFIG.INSIGNIFICANTIA_SITE_NAME}
         </Link>
 
-        <nav className='ins-nav-desktop' aria-label='主导航'>
+        <nav className='ins-nav-links' aria-label='Primary navigation'>
           <Link href='/page/1'>ARTICLE</Link>
           <Link href='/archive'>ARCHIVE</Link>
           <Link href='/about'>ABOUT</Link>
         </nav>
 
         <button
+          className='ins-menu-toggle'
           type='button'
-          className='ins-menu-button'
-          aria-label={open ? '关闭菜单' : '打开菜单'}
+          aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
           onClick={() => setOpen(value => !value)}>
-          <span />
-          <span />
           <span />
         </button>
       </div>
 
-      <div className={`ins-mobile-menu ${open ? 'is-open' : ''}`}>
+      <nav
+        className={`ins-mobile-menu ${open ? 'open' : ''}`}
+        aria-label='Mobile navigation'>
         <Link href='/page/1' onClick={() => setOpen(false)}>
           ARTICLE
         </Link>
@@ -45,7 +40,7 @@ const SiteHeader = () => {
         <Link href='/about' onClick={() => setOpen(false)}>
           ABOUT
         </Link>
-      </div>
+      </nav>
     </header>
   )
 }

@@ -1,23 +1,19 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import CONFIG from '../config'
 
 const SLIDES = [
-  {
-    label: 'DESIGN / 01',
-    className: 'ins-slide-one'
-  },
-  {
-    label: 'DESIGN / 02',
-    className: 'ins-slide-two'
-  },
-  {
-    label: 'DESIGN / 03',
-    className: 'ins-slide-three'
-  }
+  { label: 'DESIGN / 01', className: 'ins-slide-one' },
+  { label: 'DESIGN / 02', className: 'ins-slide-two' },
+  { label: 'DESIGN / 03', className: 'ins-slide-three' }
 ]
 
 const Hero = () => {
   const [current, setCurrent] = useState(0)
+
+  const show = index => {
+    setCurrent((index + SLIDES.length) % SLIDES.length)
+  }
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -28,74 +24,72 @@ const Hero = () => {
 
   return (
     <section className='ins-hero'>
-      <div className='ins-hero-copy'>
-        <div className='ins-kicker'>HOBBY DRIVEN · AI NATIVE</div>
-
-        <h1>以爱好驱动的AI原生博客。</h1>
-
-        <p>
-          游戏行业深度洞察，模拟驾驶，跑鞋与厨艺，与AI共同完成。
-        </p>
-
-        <div className='ins-hero-actions'>
-          <a className='ins-button ins-button-primary' href='#latest-posts'>
-            浏览文章 →
-          </a>
-          <Link className='ins-button ins-button-secondary' href='/about'>
-            关于这里
-          </Link>
-        </div>
-      </div>
-
-      <div className='ins-hero-visual'>
-        <div className='ins-carousel' aria-label='视觉作品轮播'>
-          {SLIDES.map((slide, index) => (
-            <div
-              key={slide.label}
-              className={`ins-carousel-slide ${slide.className} ${
-                index === current ? 'is-active' : ''
-              }`}>
-              <span>{slide.label}</span>
-            </div>
-          ))}
-
-          <button
-            type='button'
-            className='ins-carousel-arrow ins-carousel-arrow-left'
-            aria-label='上一张'
-            onClick={() =>
-              setCurrent(value => (value - 1 + SLIDES.length) % SLIDES.length)
-            }>
-            ‹
-          </button>
-
-          <button
-            type='button'
-            className='ins-carousel-arrow ins-carousel-arrow-right'
-            aria-label='下一张'
-            onClick={() =>
-              setCurrent(value => (value + 1) % SLIDES.length)
-            }>
-            ›
-          </button>
-
-          <div className='ins-carousel-dots'>
-            {SLIDES.map((slide, index) => (
-              <button
-                type='button'
-                key={slide.label}
-                aria-label={`切换到第 ${index + 1} 张`}
-                className={index === current ? 'is-active' : ''}
-                onClick={() => setCurrent(index)}
-              />
-            ))}
+      <div className='ins-hero-inner'>
+        <div className='ins-hero-copy-column'>
+          <div className='ins-hero-kicker'>{CONFIG.INSIGNIFICANTIA_HERO_KICKER}</div>
+          <h1 className='ins-hero-title'>{CONFIG.INSIGNIFICANTIA_HERO_TITLE}</h1>
+          <p className='ins-hero-copy'>
+            {CONFIG.INSIGNIFICANTIA_HERO_DESCRIPTION}
+          </p>
+          <div className='ins-hero-actions'>
+            <a className='ins-btn primary' href='#posts'>
+              浏览文章 →
+            </a>
+            <Link className='ins-btn' href='/about'>
+              关于这里
+            </Link>
           </div>
         </div>
 
-        <div className='ins-symbols' aria-hidden='true'>
-          <span>△</span>
-          <span>○</span>
-          <span>□</span>
+        <div className='ins-hero-visual'>
+          <div className='ins-carousel' aria-label='视觉作品轮播'>
+            <div className='ins-carousel-track'>
+              {SLIDES.map((slide, index) => (
+                <div
+                  key={slide.label}
+                  className={`ins-slide ${slide.className} ${
+                    index === current ? 'active' : ''
+                  }`}>
+                  <span className='ins-slide-label'>{slide.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              className='ins-carousel-arrow prev'
+              type='button'
+              aria-label='上一张'
+              onClick={() => show(current - 1)}>
+              ‹
+            </button>
+            <button
+              className='ins-carousel-arrow next'
+              type='button'
+              aria-label='下一张'
+              onClick={() => show(current + 1)}>
+              ›
+            </button>
+
+            <div className='ins-carousel-dots'>
+              {SLIDES.map((slide, index) => (
+                <button
+                  key={slide.label}
+                  className={`ins-carousel-dot ${
+                    index === current ? 'active' : ''
+                  }`}
+                  type='button'
+                  aria-label={`显示第 ${index + 1} 张轮播图`}
+                  onClick={() => show(index)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className='ins-hero-symbols' aria-hidden='true'>
+            <span>△</span>
+            <span>○</span>
+            <span>□</span>
+          </div>
         </div>
       </div>
     </section>

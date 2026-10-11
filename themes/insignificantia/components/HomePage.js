@@ -1,5 +1,6 @@
 import Hero from './Hero'
 import PostCard from './PostCard'
+import CONFIG from '../config'
 
 const HomePage = props => {
   const source =
@@ -9,37 +10,30 @@ const HomePage = props => {
 
   const posts = source
     .filter(post => post && post.type !== 'Menu' && post.type !== 'SubMenu')
-    .slice(0, 12)
+    .slice(0, CONFIG.INSIGNIFICANTIA_HOME_POST_COUNT)
 
   return (
     <>
       <Hero />
-
-      <main id='latest-posts' className='ins-home-content'>
-        <section className='ins-post-list' aria-label='最新文章'>
+      <section className='ins-home-content' id='posts'>
+        <div className='ins-post-list'>
           {posts.map((post, index) => (
             <PostCard
               key={post.id || post.pageId || post.slug || `${post.title}-${index}`}
               post={post}
             />
           ))}
+        </div>
 
-          {posts.length === 0 && (
-            <div className='ins-empty-state'>
-              暂时没有可显示的文章。
-            </div>
-          )}
-        </section>
-
-        <div className='ins-home-bottom-actions'>
-          <a className='ins-button ins-button-primary' href='/page/1'>
+        <div className='ins-home-end-actions'>
+          <a className='ins-btn primary' href='/page/1'>
             浏览全部
           </a>
-          <a className='ins-button ins-button-secondary' href='#theme-insignificantia'>
-            返回顶部 ↑
+          <a className='ins-btn' href='#top'>
+            返回顶部
           </a>
         </div>
-      </main>
+      </section>
     </>
   )
 }
