@@ -1,0 +1,95 @@
+name: Fix ARTICLE with Native Pagination V1.7.3
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-native-article:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Remove custom ARTICLE route and patch native pagination
+        run: |
+          mkdir -p "$(dirname 'pages/page/[page].js')"
+          echo 'aW1wb3J0IEJMT0cgZnJvbSAnQC9ibG9nLmNvbmZpZycKaW1wb3J0IHsgc2l0ZUNvbmZpZyB9IGZyb20gJ0AvbGliL2NvbmZpZycKaW1wb3J0IHsgZmV0Y2hHbG9iYWxBbGxEYXRhLCBnZXRQb3N0QmxvY2tzIH0gZnJvbSAnQC9saWIvZGIvU2l0ZURhdGFBcGknCmltcG9ydCB7IGZvcm1hdE5vdGlvbkJsb2NrIH0gZnJvbSAnQC9saWIvZGIvbm90aW9uL2dldFBvc3RCbG9ja3MnCmltcG9ydCB7IGFkYXB0ZXJOb3Rpb25CbG9ja01hcCB9IGZyb20gJ0AvbGliL3V0aWxzL25vdGlvbi51dGlsJwppbXBvcnQgeyBEeW5hbWljTGF5b3V0IH0gZnJvbSAnQC90aGVtZXMvdGhlbWUnCgovKioKICog5paH56ug5YiX6KGo5YiG6aG1CiAqIEBwYXJhbSB7Kn0gcHJvcHMKICogQHJldHVybnMKICovCmNvbnN0IFBhZ2UgPSBwcm9wcyA9PiB7CiAgY29uc3QgdGhlbWUgPSBzaXRlQ29uZmlnKCdUSEVNRScsIEJMT0cuVEhFTUUsIHByb3BzLk5PVElPTl9DT05GSUcpCiAgcmV0dXJuIDxEeW5hbWljTGF5b3V0IHRoZW1lPXt0aGVtZX0gbGF5b3V0TmFtZT0nTGF5b3V0UG9zdExpc3QnIHsuLi5wcm9wc30gLz4KfQoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGdldFN0YXRpY1BhdGhzKHsgbG9jYWxlIH0pIHsKICBjb25zdCBmcm9tID0gJ3BhZ2UtcGF0aHMnCiAgY29uc3QgeyBwb3N0Q291bnQsIE5PVElPTl9DT05GSUcgfSA9IGF3YWl0IGZldGNoR2xvYmFsQWxsRGF0YSh7IGZyb20sIGxvY2FsZSB9KQogIGNvbnN0IHRvdGFsUGFnZXMgPSBNYXRoLm1heCgKICAgIDEsCiAgICBNYXRoLmNlaWwoCiAgICAgIHBvc3RDb3VudCAvIHNpdGVDb25maWcoJ1BPU1RTX1BFUl9QQUdFJywgbnVsbCwgTk9USU9OX0NPTkZJRykKICAgICkKICApCiAgcmV0dXJuIHsKICAgIC8vIEluc2lnbmlmaWNhbnRpYS4gdXNlcyB0aGUgbmF0aXZlIHBhZ2luYXRpb24gcm91dGUgZm9yIEFSVElDTEUsCiAgICAvLyBpbmNsdWRpbmcgcGFnZSAxIGF0IC9wYWdlLzEuCiAgICBwYXRoczogQXJyYXkuZnJvbSh7IGxlbmd0aDogdG90YWxQYWdlcyB9LCAoXywgaSkgPT4gKHsKICAgICAgcGFyYW1zOiB7IHBhZ2U6ICcnICsgKGkgKyAxKSB9CiAgICB9KSksCiAgICBmYWxsYmFjazogdHJ1ZQogIH0KfQoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGdldFN0YXRpY1Byb3BzKHsgcGFyYW1zOiB7IHBhZ2UgfSwgbG9jYWxlIH0pIHsKICBjb25zdCBmcm9tID0gYHBhZ2UtJHtwYWdlfWAKICBjb25zdCBwcm9wcyA9IGF3YWl0IGZldGNoR2xvYmFsQWxsRGF0YSh7IGZyb20sIGxvY2FsZSB9KQogIGNvbnN0IHsgYWxsUGFnZXMgfSA9IHByb3BzCiAgY29uc3QgUE9TVF9QUkVWSUVXX0xJTkVTID0gc2l0ZUNvbmZpZygKICAgICdQT1NUX1BSRVZJRVdfTElORVMnLAogICAgMTIsCiAgICBwcm9wcz8uTk9USU9OX0NPTkZJRwogICkKCiAgY29uc3QgYWxsUG9zdHMgPSBhbGxQYWdlcz8uZmlsdGVyKAogICAgcGFnZSA9PiBwYWdlLnR5cGUgPT09ICdQb3N0JyAmJiBwYWdlLnN0YXR1cyA9PT0gJ1B1Ymxpc2hlZCcKICApCiAgY29uc3QgUE9TVFNfUEVSX1BBR0UgPSBzaXRlQ29uZmlnKCdQT1NUU19QRVJfUEFHRScsIDEyLCBwcm9wcz8uTk9USU9OX0NPTkZJRykKICAvLyDlpITnkIbliIbpobUKICBwcm9wcy5wb3N0cyA9IGFsbFBvc3RzLnNsaWNlKAogICAgUE9TVFNfUEVSX1BBR0UgKiAocGFnZSAtIDEpLAogICAgUE9TVFNfUEVSX1BBR0UgKiBwYWdlCiAgKQogIHByb3BzLnBhZ2UgPSBwYWdlCgogIC8vIOWkhOeQhumihOiniAogIGlmIChzaXRlQ29uZmlnKCdQT1NUX0xJU1RfUFJFVklFVycsIGZhbHNlLCBwcm9wcz8uTk9USU9OX0NPTkZJRykpIHsKICAgIGZvciAoY29uc3QgaSBpbiBwcm9wcy5wb3N0cykgewogICAgICBjb25zdCBwb3N0ID0gcHJvcHMucG9zdHNbaV0KICAgICAgaWYgKHBvc3QucGFzc3dvcmQgJiYgcG9zdC5wYXNzd29yZCAhPT0gJycpIHsKICAgICAgICBjb250aW51ZQogICAgICB9CiAgICAgIGNvbnN0IHJhd0Jsb2NrTWFwID0gYXdhaXQgZ2V0UG9zdEJsb2Nrcyhwb3N0LmlkLCAnc2x1ZycsIFBPU1RfUFJFVklFV19MSU5FUykKICAgICAgcG9zdC5ibG9ja01hcCA9IGFkYXB0ZXJOb3Rpb25CbG9ja01hcChyYXdCbG9ja01hcCkKICAgICAgaWYgKHBvc3QuYmxvY2tNYXA/LmJsb2NrKSB7CiAgICAgICAgcG9zdC5ibG9ja01hcC5ibG9jayA9IGZvcm1hdE5vdGlvbkJsb2NrKHBvc3QuYmxvY2tNYXAuYmxvY2spCiAgICAgIH0KICAgIH0KICB9CgogIGRlbGV0ZSBwcm9wcy5hbGxQYWdlcwogIHJldHVybiB7CiAgICBwcm9wcywKICAgIHJldmFsaWRhdGU6IHByb2Nlc3MuZW52LkVYUE9SVAogICAgICA/IHVuZGVmaW5lZAogICAgICA6IHNpdGVDb25maWcoCiAgICAgICAgICAnTkVYVF9SRVZBTElEQVRFX1NFQ09ORCcsCiAgICAgICAgICBCTE9HLk5FWFRfUkVWQUxJREFURV9TRUNPTkQsCiAgICAgICAgICBwcm9wcy5OT1RJT05fQ09ORklHCiAgICAgICAgKQogIH0KfQoKZXhwb3J0IGRlZmF1bHQgUGFnZQo=' | base64 --decode > 'pages/page/[page].js'
+          mkdir -p "$(dirname 'themes/insignificantia/components/SiteHeader.js')"
+          echo 'aW1wb3J0IExpbmsgZnJvbSAnbmV4dC9saW5rJwppbXBvcnQgeyB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JwppbXBvcnQgQ09ORklHIGZyb20gJy4uL2NvbmZpZycKCmNvbnN0IFNpdGVIZWFkZXIgPSAoKSA9PiB7CiAgY29uc3QgW29wZW4sIHNldE9wZW5dID0gdXNlU3RhdGUoZmFsc2UpCgogIHJldHVybiAoCiAgICA8aGVhZGVyIGNsYXNzTmFtZT0naW5zLXNpdGUtaGVhZGVyJz4KICAgICAgPGRpdiBjbGFzc05hbWU9J2lucy1uYXYtaW5uZXInPgogICAgICAgIDxMaW5rIGNsYXNzTmFtZT0naW5zLWJyYW5kJyBocmVmPScvJyBhcmlhLWxhYmVsPSdJbnNpZ25pZmljYW50aWEuIEhvbWUnPgogICAgICAgICAge0NPTkZJRy5JTlNJR05JRklDQU5USUFfU0lURV9OQU1FfQogICAgICAgIDwvTGluaz4KCiAgICAgICAgPG5hdiBjbGFzc05hbWU9J2lucy1uYXYtbGlua3MnIGFyaWEtbGFiZWw9J1ByaW1hcnkgbmF2aWdhdGlvbic+CiAgICAgICAgICA8TGluayBocmVmPScvcGFnZS8xJz5BUlRJQ0xFPC9MaW5rPgogICAgICAgICAgPExpbmsgaHJlZj0nL2FyY2hpdmUnPkFSQ0hJVkU8L0xpbms+CiAgICAgICAgICA8TGluayBocmVmPScvYWJvdXQnPkFCT1VUPC9MaW5rPgogICAgICAgIDwvbmF2PgoKICAgICAgICA8YnV0dG9uCiAgICAgICAgICBjbGFzc05hbWU9J2lucy1tZW51LXRvZ2dsZScKICAgICAgICAgIHR5cGU9J2J1dHRvbicKICAgICAgICAgIGFyaWEtbGFiZWw9e29wZW4gPyAnQ2xvc2UgbWVudScgOiAnT3BlbiBtZW51J30KICAgICAgICAgIGFyaWEtZXhwYW5kZWQ9e29wZW59CiAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBzZXRPcGVuKHZhbHVlID0+ICF2YWx1ZSl9PgogICAgICAgICAgPHNwYW4gLz4KICAgICAgICA8L2J1dHRvbj4KICAgICAgPC9kaXY+CgogICAgICA8bmF2CiAgICAgICAgY2xhc3NOYW1lPXtgaW5zLW1vYmlsZS1tZW51ICR7b3BlbiA/ICdvcGVuJyA6ICcnfWB9CiAgICAgICAgYXJpYS1sYWJlbD0nTW9iaWxlIG5hdmlnYXRpb24nPgogICAgICAgIDxMaW5rIGhyZWY9Jy9wYWdlLzEnIG9uQ2xpY2s9eygpID0+IHNldE9wZW4oZmFsc2UpfT4KICAgICAgICAgIEFSVElDTEUKICAgICAgICA8L0xpbms+CiAgICAgICAgPExpbmsgaHJlZj0nL2FyY2hpdmUnIG9uQ2xpY2s9eygpID0+IHNldE9wZW4oZmFsc2UpfT4KICAgICAgICAgIEFSQ0hJVkUKICAgICAgICA8L0xpbms+CiAgICAgICAgPExpbmsgaHJlZj0nL2Fib3V0JyBvbkNsaWNrPXsoKSA9PiBzZXRPcGVuKGZhbHNlKX0+CiAgICAgICAgICBBQk9VVAogICAgICAgIDwvTGluaz4KICAgICAgPC9uYXY+CiAgICA8L2hlYWRlcj4KICApCn0KCmV4cG9ydCBkZWZhdWx0IFNpdGVIZWFkZXIK' | base64 --decode > 'themes/insignificantia/components/SiteHeader.js'
+          mkdir -p "$(dirname 'themes/insignificantia/components/HomePage.js')"
+          echo 'aW1wb3J0IEhlcm8gZnJvbSAnLi9IZXJvJwppbXBvcnQgUG9zdENhcmQgZnJvbSAnLi9Qb3N0Q2FyZCcKaW1wb3J0IENPTkZJRyBmcm9tICcuLi9jb25maWcnCgpjb25zdCBIb21lUGFnZSA9IHByb3BzID0+IHsKICBjb25zdCBzb3VyY2UgPQogICAgKEFycmF5LmlzQXJyYXkocHJvcHM/LmxhdGVzdFBvc3RzKSAmJiBwcm9wcy5sYXRlc3RQb3N0cy5sZW5ndGggPiAwCiAgICAgID8gcHJvcHMubGF0ZXN0UG9zdHMKICAgICAgOiBwcm9wcz8ucG9zdHMpIHx8IFtdCgogIGNvbnN0IHBvc3RzID0gc291cmNlCiAgICAuZmlsdGVyKHBvc3QgPT4gcG9zdCAmJiBwb3N0LnR5cGUgIT09ICdNZW51JyAmJiBwb3N0LnR5cGUgIT09ICdTdWJNZW51JykKICAgIC5zbGljZSgwLCBDT05GSUcuSU5TSUdOSUZJQ0FOVElBX0hPTUVfUE9TVF9DT1VOVCkKCiAgcmV0dXJuICgKICAgIDw+CiAgICAgIDxIZXJvIC8+CiAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT0naW5zLWhvbWUtY29udGVudCcgaWQ9J3Bvc3RzJz4KICAgICAgICA8ZGl2IGNsYXNzTmFtZT0naW5zLXBvc3QtbGlzdCc+CiAgICAgICAgICB7cG9zdHMubWFwKChwb3N0LCBpbmRleCkgPT4gKAogICAgICAgICAgICA8UG9zdENhcmQKICAgICAgICAgICAgICBrZXk9e3Bvc3QuaWQgfHwgcG9zdC5wYWdlSWQgfHwgcG9zdC5zbHVnIHx8IGAke3Bvc3QudGl0bGV9LSR7aW5kZXh9YH0KICAgICAgICAgICAgICBwb3N0PXtwb3N0fQogICAgICAgICAgICAvPgogICAgICAgICAgKSl9CiAgICAgICAgPC9kaXY+CgogICAgICAgIDxkaXYgY2xhc3NOYW1lPSdpbnMtaG9tZS1lbmQtYWN0aW9ucyc+CiAgICAgICAgICA8YSBjbGFzc05hbWU9J2lucy1idG4gcHJpbWFyeScgaHJlZj0nL3BhZ2UvMSc+CiAgICAgICAgICAgIOa1j+iniOWFqOmDqAogICAgICAgICAgPC9hPgogICAgICAgICAgPGEgY2xhc3NOYW1lPSdpbnMtYnRuJyBocmVmPScjdG9wJz4KICAgICAgICAgICAg6L+U5Zue6aG26YOoCiAgICAgICAgICA8L2E+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvc2VjdGlvbj4KICAgIDwvPgogICkKfQoKZXhwb3J0IGRlZmF1bHQgSG9tZVBhZ2UK' | base64 --decode > 'themes/insignificantia/components/HomePage.js'
+          mkdir -p "$(dirname 'themes/insignificantia/components/ArticleListPage.js')"
+          echo 'aW1wb3J0IExpbmsgZnJvbSAnbmV4dC9saW5rJwppbXBvcnQgeyB1c2VSb3V0ZXIgfSBmcm9tICduZXh0L3JvdXRlcicKCmNvbnN0IFBBR0VfU0laRSA9IDE1Cgpjb25zdCBzYWZlTnVtYmVyID0gKHZhbHVlLCBmYWxsYmFjaykgPT4gewogIGNvbnN0IG51bWJlciA9IE51bWJlcih2YWx1ZSkKICByZXR1cm4gTnVtYmVyLmlzRmluaXRlKG51bWJlcikgJiYgbnVtYmVyID4gMAogICAgPyBudW1iZXIKICAgIDogZmFsbGJhY2sKfQoKY29uc3QgZ2V0SHJlZiA9IHBvc3QgPT4gewogIGlmIChwb3N0Py5ocmVmKSByZXR1cm4gcG9zdC5ocmVmCiAgaWYgKHBvc3Q/LnNsdWcpIHJldHVybiBgLyR7cG9zdC5zbHVnfWAKICByZXR1cm4gJy8nCn0KCmNvbnN0IGdldERhdGUgPSBwb3N0ID0+CiAgcG9zdD8ucHVibGlzaERheSB8fCBwb3N0Py5kYXRlIHx8ICcnCgpjb25zdCBpc0FydGljbGUgPSBwb3N0ID0+IHsKICBpZiAoIXBvc3QpIHJldHVybiBmYWxzZQoKICBjb25zdCB0eXBlID0gU3RyaW5nKHBvc3QudHlwZSB8fCAnJykudG9Mb3dlckNhc2UoKQogIGNvbnN0IGV4Y2x1ZGVkID0gbmV3IFNldChbCiAgICAnbWVudScsCiAgICAnc3VibWVudScsCiAgICAncGFnZScsCiAgICAnbm90aWNlJywKICAgICdjb25maWcnCiAgXSkKCiAgcmV0dXJuICFleGNsdWRlZC5oYXModHlwZSkKfQoKY29uc3QgQXJ0aWNsZUxpc3RQYWdlID0gKHsKICBwb3N0cywKICBhcmNoaXZlUG9zdHMsCiAgcG9zdENvdW50LAogIHRvdGFsUG9zdENvdW50LAogIHRvdGFsLAogIHBhZ2UsCiAgcGFnZU51bSwKICBjdXJyZW50UGFnZTogY3VycmVudFBhZ2VQcm9wLAogIGtpY2tlciA9ICdBUlRJQ0xFJywKICBwYWdlU2l6ZSA9IFBBR0VfU0laRSwKICBtYWtlUGFnZUhyZWYKfSkgPT4gewogIGNvbnN0IHJvdXRlciA9IHVzZVJvdXRlcigpCgogIGNvbnN0IGN1cnJlbnRQYWdlID0gc2FmZU51bWJlcigKICAgIHJvdXRlcj8ucXVlcnk/LnBhZ2UgfHwKICAgICAgcm91dGVyPy5xdWVyeT8ucCB8fAogICAgICBwYWdlIHx8CiAgICAgIHBhZ2VOdW0gfHwKICAgICAgY3VycmVudFBhZ2VQcm9wLAogICAgMQogICkKCiAgY29uc3QgcmF3UG9zdHMgPQogICAgQXJyYXkuaXNBcnJheShwb3N0cykgJiYgcG9zdHMubGVuZ3RoID4gMAogICAgICA/IHBvc3RzCiAgICAgIDogQXJyYXkuaXNBcnJheShhcmNoaXZlUG9zdHMpCiAgICAgICAgPyBhcmNoaXZlUG9zdHMKICAgICAgICA6IFtdCgogIGNvbnN0IHNvdXJjZVBvc3RzID0gcmF3UG9zdHMuZmlsdGVyKGlzQXJ0aWNsZSkKCiAgY29uc3QgZGVjbGFyZWRQb3N0Q291bnQgPSBzYWZlTnVtYmVyKAogICAgcG9zdENvdW50IHx8CiAgICAgIHRvdGFsUG9zdENvdW50IHx8CiAgICAgIHRvdGFsIHx8CiAgICAgIHNvdXJjZVBvc3RzLmxlbmd0aCwKICAgIHNvdXJjZVBvc3RzLmxlbmd0aAogICkKCiAgY29uc3QgdG90YWxQYWdlcyA9IE1hdGgubWF4KAogICAgMSwKICAgIE1hdGguY2VpbChkZWNsYXJlZFBvc3RDb3VudCAvIHBhZ2VTaXplKQogICkKCiAgY29uc3QgcG9zdHNBcmVBbHJlYWR5UGFnZWQgPQogICAgZGVjbGFyZWRQb3N0Q291bnQgPiBzb3VyY2VQb3N0cy5sZW5ndGggJiYKICAgIHNvdXJjZVBvc3RzLmxlbmd0aCA8PSBwYWdlU2l6ZQoKICBjb25zdCB2aXNpYmxlUG9zdHMgPSBwb3N0c0FyZUFscmVhZHlQYWdlZAogICAgPyBzb3VyY2VQb3N0cwogICAgOiBzb3VyY2VQb3N0cy5zbGljZSgKICAgICAgICAoY3VycmVudFBhZ2UgLSAxKSAqIHBhZ2VTaXplLAogICAgICAgIGN1cnJlbnRQYWdlICogcGFnZVNpemUKICAgICAgKQoKICBjb25zdCBwYWdlSHJlZiA9IHBhZ2VOdW1iZXIgPT4gewogICAgaWYgKHR5cGVvZiBtYWtlUGFnZUhyZWYgPT09ICdmdW5jdGlvbicpIHsKICAgICAgcmV0dXJuIG1ha2VQYWdlSHJlZihwYWdlTnVtYmVyKQogICAgfQoKICAgIHJldHVybiBwYWdlTnVtYmVyID09PSAxCiAgICAgID8gJy9wYWdlLzEnCiAgICAgIDogYC9wYWdlLyR7cGFnZU51bWJlcn1gCiAgfQoKICByZXR1cm4gKAogICAgPG1haW4gY2xhc3NOYW1lPSdpbnMtYXJ0aWNsZS1pbmRleCc+CiAgICAgIDxoZWFkZXIgY2xhc3NOYW1lPSdpbnMtYXJ0aWNsZS1pbmRleC1oZWFkZXInPgogICAgICAgIDxkaXYgY2xhc3NOYW1lPSdpbnMtcGFnZS1raWNrZXInPgogICAgICAgICAge2tpY2tlcn0KICAgICAgICA8L2Rpdj4KICAgICAgPC9oZWFkZXI+CgogICAgICA8c2VjdGlvbgogICAgICAgIGNsYXNzTmFtZT0naW5zLWFydGljbGUtaW5kZXgtbGlzdCcKICAgICAgICBhcmlhLWxhYmVsPXtraWNrZXJ9PgogICAgICAgIHt2aXNpYmxlUG9zdHMubWFwKChwb3N0LCBpbmRleCkgPT4gKAogICAgICAgICAgPExpbmsKICAgICAgICAgICAga2V5PXsKICAgICAgICAgICAgICBwb3N0LmlkIHx8CiAgICAgICAgICAgICAgcG9zdC5wYWdlSWQgfHwKICAgICAgICAgICAgICBwb3N0LnNsdWcgfHwKICAgICAgICAgICAgICBgJHtwb3N0LnRpdGxlfS0ke2luZGV4fWAKICAgICAgICAgICAgfQogICAgICAgICAgICBocmVmPXtnZXRIcmVmKHBvc3QpfQogICAgICAgICAgICBjbGFzc05hbWU9J2lucy1hcnRpY2xlLWxpc3QtY2FyZCcKICAgICAgICAgICAgYXJpYS1sYWJlbD17YOmYheivu++8miR7CiAgICAgICAgICAgICAgcG9zdD8udGl0bGUgfHwgJ1VudGl0bGVkJwogICAgICAgICAgICB9YH0+CiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPSdpbnMtYXJ0aWNsZS1saXN0LWRhdGUnPgogICAgICAgICAgICAgIHtnZXREYXRlKHBvc3QpfQogICAgICAgICAgICA8L2Rpdj4KCiAgICAgICAgICAgIDxoMj57cG9zdD8udGl0bGUgfHwgJ1VudGl0bGVkJ308L2gyPgoKICAgICAgICAgICAge3Bvc3Q/LnN1bW1hcnkgJiYgKAogICAgICAgICAgICAgIDxwPntwb3N0LnN1bW1hcnl9PC9wPgogICAgICAgICAgICApfQoKICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9J2lucy1hcnRpY2xlLWxpc3QtYWN0aW9ucyc+CiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPSdpbnMtcmVhZC1tb3JlJz4KICAgICAgICAgICAgICAgIOe7p+e7remYheivuwogICAgICAgICAgICAgIDwvc3Bhbj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICA8L0xpbms+CiAgICAgICAgKSl9CgogICAgICAgIHt2aXNpYmxlUG9zdHMubGVuZ3RoID09PSAwICYmICgKICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPSdpbnMtYXJ0aWNsZS1saXN0LWVtcHR5Jz4KICAgICAgICAgICAg5pqC5pe25rKh5pyJ5Y+v5pi+56S655qE5paH56ug44CCCiAgICAgICAgICA8L2Rpdj4KICAgICAgICApfQogICAgICA8L3NlY3Rpb24+CgogICAgICB7dG90YWxQYWdlcyA+IDEgJiYgKAogICAgICAgIDxuYXYKICAgICAgICAgIGNsYXNzTmFtZT0naW5zLXBhZ2luYXRpb24nCiAgICAgICAgICBhcmlhLWxhYmVsPSfmlofnq6DliIbpobUnPgogICAgICAgICAge0FycmF5LmZyb20oCiAgICAgICAgICAgIHsgbGVuZ3RoOiB0b3RhbFBhZ2VzIH0sCiAgICAgICAgICAgIChfLCBpbmRleCkgPT4gewogICAgICAgICAgICAgIGNvbnN0IHBhZ2VOdW1iZXIgPSBpbmRleCArIDEKCiAgICAgICAgICAgICAgcmV0dXJuICgKICAgICAgICAgICAgICAgIDxMaW5rCiAgICAgICAgICAgICAgICAgIGtleT17cGFnZU51bWJlcn0KICAgICAgICAgICAgICAgICAgaHJlZj17cGFnZUhyZWYocGFnZU51bWJlcil9CiAgICAgICAgICAgICAgICAgIGFyaWEtY3VycmVudD17CiAgICAgICAgICAgICAgICAgICAgcGFnZU51bWJlciA9PT0gY3VycmVudFBhZ2UKICAgICAgICAgICAgICAgICAgICAgID8gJ3BhZ2UnCiAgICAgICAgICAgICAgICAgICAgICA6IHVuZGVmaW5lZAogICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT17YGlucy1wYWdlLWRvdCAkewogICAgICAgICAgICAgICAgICAgIHBhZ2VOdW1iZXIgPT09IGN1cnJlbnRQYWdlCiAgICAgICAgICAgICAgICAgICAgICA/ICdpcy1jdXJyZW50JwogICAgICAgICAgICAgICAgICAgICAgOiAnJwogICAgICAgICAgICAgICAgICB9YH0+CiAgICAgICAgICAgICAgICAgIHtwYWdlTnVtYmVyfQogICAgICAgICAgICAgICAgPC9MaW5rPgogICAgICAgICAgICAgICkKICAgICAgICAgICAgfQogICAgICAgICAgKX0KICAgICAgICA8L25hdj4KICAgICAgKX0KICAgIDwvbWFpbj4KICApCn0KCmV4cG9ydCBkZWZhdWx0IEFydGljbGVMaXN0UGFnZQo=' | base64 --decode > 'themes/insignificantia/components/ArticleListPage.js'
+          rm -f pages/article.js
+
+      - name: Verify source before commit
+        run: |
+          set -euxo pipefail
+
+          test ! -f pages/article.js
+          grep -F "params: { page: '' + (i + 1) }" "pages/page/[page].js"
+          grep -F "Math.max(" "pages/page/[page].js"
+          grep -F "href='/page/1'" themes/insignificantia/components/SiteHeader.js
+          grep -F "href='/page/1'" themes/insignificantia/components/HomePage.js
+          grep -F "? '/page/1'" themes/insignificantia/components/ArticleListPage.js
+
+          echo "Native ARTICLE route source verified."
+
+      - name: Commit and push safely
+        run: |
+          set -euxo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A             pages/article.js             "pages/page/[page].js"             themes/insignificantia/components/SiteHeader.js             themes/insignificantia/components/HomePage.js             themes/insignificantia/components/ArticleListPage.js
+
+          if git diff --cached --quiet; then
+            echo "ERROR: no ARTICLE route changes detected."
+            exit 1
+          fi
+
+          git commit -m "Use native page route for ARTICLE"
+
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+
+            if git push origin HEAD:main; then
+              echo "Push succeeded."
+              break
+            fi
+
+            if [ "$attempt" = "3" ]; then
+              echo "Push failed after 3 attempts."
+              exit 1
+            fi
+
+            sleep 3
+          done
+
+      - name: Verify remote main
+        run: |
+          set -euxo pipefail
+
+          git fetch origin main
+
+          if git cat-file -e origin/main:pages/article.js 2>/dev/null; then
+            echo "ERROR: pages/article.js still exists on remote main."
+            exit 1
+          fi
+
+          git show 'origin/main:pages/page/[page].js'             | grep -F "params: { page: '' + (i + 1) }"
+
+          git show origin/main:themes/insignificantia/components/SiteHeader.js             | grep -F "href='/page/1'"
+
+          git show origin/main:themes/insignificantia/components/HomePage.js             | grep -F "href='/page/1'"
+
+          echo "REMOTE MAIN VERIFIED: ARTICLE now uses /page/1."
