@@ -75,7 +75,9 @@ const ArchivePage = props => {
         {...props}
         posts={filteredPosts}
         postCount={filteredPosts.length}
-        kicker={`ARCHIVE RESULT · ${selectedYear}`}
+        kicker='ARCHIVE RESULT'
+        contextLabel='YEAR'
+        contextValue={selectedYear}
         makePageHref={pageNumber =>
           `/archive?year=${encodeURIComponent(
             selectedYear

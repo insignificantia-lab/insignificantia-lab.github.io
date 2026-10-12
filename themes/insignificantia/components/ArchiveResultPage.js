@@ -23,7 +23,9 @@ const ArchiveResultPage = props => {
   return (
     <ArticleListPage
       {...props}
-      kicker={`ARCHIVE RESULT · ${label}`}
+      kicker='ARCHIVE RESULT'
+      contextLabel={isCategory ? 'CATEGORY' : 'TAG'}
+      contextValue={label}
       makePageHref={pageNumber =>
         `${base}/${pageNumber}`
       }

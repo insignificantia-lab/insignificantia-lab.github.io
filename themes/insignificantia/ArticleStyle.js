@@ -11,6 +11,33 @@ export const ArticleStyle = () => {
         margin: 0 0 34px;
       }
 
+      .ins-result-context {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        margin-top: 13px;
+        min-width: 0;
+      }
+
+      .ins-result-context-label {
+        flex: 0 0 auto;
+        color: var(--ins-pink);
+        font-size: 11px;
+        line-height: 1.5;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+      }
+
+      .ins-result-context-value {
+        min-width: 0;
+        color: var(--ins-text);
+        font-size: clamp(31px, 4.8vw, 54px);
+        line-height: 1.05;
+        font-weight: 760;
+        letter-spacing: -0.035em;
+        overflow-wrap: anywhere;
+      }
+
       .ins-page-kicker {
         color: var(--ins-pink) !important;
         font-size: 12px;
@@ -84,10 +111,21 @@ export const ArticleStyle = () => {
 
       .ins-article-list-actions {
         display: flex;
-        justify-content: flex-end;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
         margin-top: 28px;
         padding-top: 20px;
         border-top: 1px solid var(--ins-line);
+      }
+
+      .ins-card-category {
+        color: var(--ins-pink);
+        font-size: 12px;
+        line-height: 1.5;
+        font-weight: 650;
+        letter-spacing: 0.08em;
+        overflow-wrap: anywhere;
       }
 
       .ins-read-more {
@@ -169,6 +207,15 @@ export const ArticleStyle = () => {
           margin-bottom: 28px;
         }
 
+        .ins-result-context {
+          gap: 11px;
+          margin-top: 11px;
+        }
+
+        .ins-result-context-value {
+          font-size: 34px;
+        }
+
         .ins-article-index-list {
           gap: 36px;
         }
@@ -183,6 +230,14 @@ export const ArticleStyle = () => {
 
         .ins-article-list-card p {
           font-size: 15px;
+        }
+
+        .ins-article-list-actions {
+          gap: 14px;
+        }
+
+        .ins-card-category {
+          font-size: 11.5px;
         }
 
         .ins-pagination {

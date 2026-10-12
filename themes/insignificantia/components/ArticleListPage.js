@@ -19,6 +19,37 @@ const getHref = post => {
 const getDate = post =>
   post?.publishDay || post?.date || ''
 
+const normalizeCategory = value => {
+  if (!value) return ''
+
+  if (typeof value === 'string') {
+    return value
+  }
+
+  if (Array.isArray(value)) {
+    return normalizeCategory(value[0])
+  }
+
+  if (typeof value === 'object') {
+    return (
+      value.name ||
+      value.value ||
+      value.label ||
+      value.text ||
+      ''
+    )
+  }
+
+  return String(value)
+}
+
+const getCategory = post =>
+  normalizeCategory(
+    post?.category ||
+    post?.categoryItems ||
+    post?.categories
+  )
+
 const isArticle = post => {
   if (!post) return false
 
@@ -44,6 +75,8 @@ const ArticleListPage = ({
   pageNum,
   currentPage: currentPageProp,
   kicker = 'ARTICLE',
+  contextLabel = '',
+  contextValue = '',
   pageSize = PAGE_SIZE,
   makePageHref
 }) => {
@@ -107,6 +140,19 @@ const ArticleListPage = ({
         <div className='ins-page-kicker'>
           {kicker}
         </div>
+
+        {contextValue && (
+          <div className='ins-result-context'>
+            {contextLabel && (
+              <span className='ins-result-context-label'>
+                {contextLabel}
+              </span>
+            )}
+            <strong className='ins-result-context-value'>
+              {contextValue}
+            </strong>
+          </div>
+        )}
       </header>
 
       <section
@@ -136,6 +182,12 @@ const ArticleListPage = ({
             )}
 
             <div className='ins-article-list-actions'>
+              {getCategory(post) && (
+                <span className='ins-card-category'>
+                  {getCategory(post)}
+                </span>
+              )}
+
               <span className='ins-read-more'>
                 继续阅读
               </span>
