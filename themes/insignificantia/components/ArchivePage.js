@@ -100,7 +100,22 @@ const ArchivePage = props => {
   ].sort((a, b) => Number(b) - Number(a))
 
   return (
-    <main className='ins-archive-page'>
+    <main
+      className='ins-archive-page'
+      data-mobile-frame='archive-v1.10'
+      style={{
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+      <div
+        data-safe-frame='archive-v1.11'
+        style={{
+          width: 'calc(100% - 40px)',
+          maxWidth: '980px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          boxSizing: 'border-box'
+        }}>
       <header className='ins-archive-header'>
         <div className='ins-page-kicker'>ARCHIVE</div>
       </header>
@@ -141,6 +156,7 @@ const ArchivePage = props => {
           </Link>
         ))}
       </section>
+      </div>
     </main>
   )
 }

@@ -135,7 +135,22 @@ const ArticleListPage = ({
   }
 
   return (
-    <main className='ins-article-index'>
+    <main
+      className='ins-article-index'
+      data-mobile-frame='article-list-v1.10'
+      style={{
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+      <div
+        data-safe-frame='article-list-v1.11'
+        style={{
+          width: 'calc(100% - 40px)',
+          maxWidth: '900px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          boxSizing: 'border-box'
+        }}>
       <header className='ins-article-index-header'>
         <div className='ins-page-kicker'>
           {kicker}
@@ -232,6 +247,7 @@ const ArticleListPage = ({
           )}
         </nav>
       )}
+      </div>
     </main>
   )
 }

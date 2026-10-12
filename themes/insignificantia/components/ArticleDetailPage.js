@@ -46,7 +46,22 @@ const ArticleDetailPage = ({
       : []
 
   return (
-    <main className='ins-article-shell'>
+    <main
+      className='ins-article-shell'
+      data-mobile-frame='article-detail-v1.10'
+      style={{
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+      <div
+        data-safe-frame='article-detail-v1.11'
+        style={{
+          width: 'calc(100% - 40px)',
+          maxWidth: '810px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          boxSizing: 'border-box'
+        }}>
       <header className='ins-article-header'>
         <div className='ins-article-date'>
           {post?.publishDay || post?.date || ''}
@@ -167,6 +182,7 @@ const ArticleDetailPage = ({
             )}
           </aside>
         )}
+      </div>
       </div>
     </main>
   )
