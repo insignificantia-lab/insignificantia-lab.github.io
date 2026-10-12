@@ -98,25 +98,43 @@ export const ArchiveStyle = () => {
 
         .ins-archive-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 16px;
+          gap: 12px;
         }
 
         .ins-archive-year-grid {
-          margin-top: 86px;
+          margin-top: 64px;
         }
 
         .ins-archive-card {
-          padding: 20px;
+          aspect-ratio: 1.18 / 1;
+          padding: 16px;
+        }
+
+        .ins-archive-card strong {
+          font-size: clamp(22px, 6.2vw, 28px);
+          line-height: 1.08;
+        }
+
+        .ins-archive-card small {
+          font-size: 10px;
+          line-height: 1.35;
+          letter-spacing: 0.08em;
         }
       }
 
       @media (max-width: 520px) {
         .ins-archive-grid {
-          grid-template-columns: 1fr;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
         }
 
         .ins-archive-card {
-          aspect-ratio: 1.3 / 1;
+          aspect-ratio: 1.18 / 1;
+          padding: 16px;
+        }
+
+        .ins-archive-card strong {
+          font-size: clamp(21px, 6.4vw, 25px);
         }
       }
 

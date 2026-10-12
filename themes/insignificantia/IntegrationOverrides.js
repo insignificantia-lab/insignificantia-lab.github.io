@@ -263,8 +263,7 @@ export const IntegrationOverrides = () => {
         }
 
         #theme-insignificantia .ins-archive-card {
-          padding-left: 20px !important;
-          padding-right: 20px !important;
+          padding: 16px !important;
         }
       }
     `}</style>
