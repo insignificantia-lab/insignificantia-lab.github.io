@@ -194,20 +194,77 @@ export const IntegrationOverrides = () => {
       }
 
       @media (max-width: 760px) {
-        #theme-insignificantia .ins-home-content .ins-post-list,
+        /*
+         * V1.9.1: use padding-box gutters instead of calc-width + margins.
+         * This keeps the gutter inside the page box and is resilient to
+         * upstream width / margin rules.
+         */
         #theme-insignificantia .ins-article-index,
-        #theme-insignificantia .ins-article-index-list,
-        #theme-insignificantia .ins-archive-page,
-        #theme-insignificantia .ins-archive-grid {
+        #theme-insignificantia .ins-archive-page {
           width: 100% !important;
           max-width: 100% !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          padding-left: 18px !important;
+          padding-right: 18px !important;
+          box-sizing: border-box !important;
+        }
+
+        #theme-insignificantia .ins-article-shell {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
         }
 
         #theme-insignificantia .ins-article-header,
-        #theme-insignificantia .ins-article-layout,
-        #theme-insignificantia .ins-article-body {
+        #theme-insignificantia .ins-article-layout {
           width: 100% !important;
           max-width: 100% !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          padding-left: 20px !important;
+          padding-right: 20px !important;
+          box-sizing: border-box !important;
+        }
+
+        #theme-insignificantia .ins-article-index-list,
+        #theme-insignificantia .ins-archive-grid,
+        #theme-insignificantia .ins-article-body,
+        #theme-insignificantia .ins-notion-content {
+          width: 100% !important;
+          max-width: 100% !important;
+          min-width: 0 !important;
+          box-sizing: border-box !important;
+        }
+
+        #theme-insignificantia .ins-article-list-card,
+        #theme-insignificantia .ins-archive-card,
+        #theme-insignificantia .ins-notion-content .notion-callout,
+        #theme-insignificantia .ins-notion-content blockquote,
+        #theme-insignificantia .ins-notion-content .notion-quote,
+        #theme-insignificantia .ins-notion-content .notion-quote-block {
+          width: 100% !important;
+          max-width: 100% !important;
+          min-width: 0 !important;
+          box-sizing: border-box !important;
+        }
+
+        #theme-insignificantia .ins-notion-content img,
+        #theme-insignificantia .ins-notion-content figure,
+        #theme-insignificantia .ins-notion-content .notion-asset-wrapper {
+          max-width: 100% !important;
+        }
+      }
+
+      @media (max-width: 520px) {
+        #theme-insignificantia .ins-article-list-card {
+          padding-left: 24px !important;
+          padding-right: 24px !important;
+        }
+
+        #theme-insignificantia .ins-archive-card {
+          padding-left: 20px !important;
+          padding-right: 20px !important;
         }
       }
     `}</style>

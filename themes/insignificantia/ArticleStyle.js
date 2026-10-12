@@ -199,8 +199,11 @@ export const ArticleStyle = () => {
 
       @media (max-width: 760px) {
         .ins-article-index {
-          width: calc(100% - 36px);
-          padding: 54px 0 86px;
+          width: 100%;
+          margin-left: 0;
+          margin-right: 0;
+          padding: 54px 18px 86px;
+          box-sizing: border-box;
         }
 
         .ins-article-index-header {
@@ -248,6 +251,13 @@ export const ArticleStyle = () => {
         .ins-page-dot {
           width: 39px;
           height: 39px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .ins-article-list-card {
+          padding-left: 24px;
+          padding-right: 24px;
         }
       }
 

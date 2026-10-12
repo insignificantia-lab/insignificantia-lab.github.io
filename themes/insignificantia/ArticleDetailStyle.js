@@ -319,8 +319,11 @@ export const ArticleDetailStyle = () => {
 
       @media (max-width: 760px) {
         .ins-article-header {
-          width: calc(100% - 40px);
-          padding: 56px 0 36px;
+          width: 100%;
+          margin-left: 0;
+          margin-right: 0;
+          padding: 56px 20px 36px;
+          box-sizing: border-box;
         }
 
         .ins-article-title {
@@ -328,8 +331,11 @@ export const ArticleDetailStyle = () => {
         }
 
         .ins-article-layout {
-          width: calc(100% - 40px);
-          padding: 6px 0 82px;
+          width: 100%;
+          margin-left: 0;
+          margin-right: 0;
+          padding: 6px 20px 82px;
+          box-sizing: border-box;
         }
 
         .ins-article-body,
