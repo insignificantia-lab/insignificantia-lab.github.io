@@ -74,18 +74,25 @@ const getLayoutLoading = layoutName => {
   return LayoutLoading
 }
 
-const normalizeThemeName = themeValue => {
-  if (!themeValue || typeof themeValue !== 'string') return BLOG.THEME
-  const firstTheme = themeValue.split(',')[0].trim()
-  if (!firstTheme) return BLOG.THEME
-  return THEMES.includes(firstTheme) ? firstTheme : BLOG.THEME
+const getConfiguredThemeName = () => {
+  const configuredTheme =
+    typeof BLOG.THEME === 'string' ? BLOG.THEME.split(',')[0].trim() : ''
+
+  if (configuredTheme && THEMES.includes(configuredTheme)) {
+    return configuredTheme
+  }
+  if (THEMES.includes('insignificantia')) {
+    return 'insignificantia'
+  }
+  return THEMES[0] || configuredTheme || 'insignificantia'
 }
 
-const getFallbackThemeName = themeName => {
-  const preferred = normalizeThemeName(BLOG.THEME)
-  if (preferred && preferred !== themeName) return preferred
-  if (THEMES.includes('example') && themeName !== 'example') return 'example'
-  return THEMES.find(item => item !== themeName) || null
+const normalizeThemeName = themeValue => {
+  const defaultTheme = getConfiguredThemeName()
+  if (!themeValue || typeof themeValue !== 'string') return defaultTheme
+  const firstTheme = themeValue.split(',')[0].trim()
+  if (!firstTheme) return defaultTheme
+  return THEMES.includes(firstTheme) ? firstTheme : defaultTheme
 }
 
 const getThemeExport = (mod, exportName) => {
@@ -133,19 +140,8 @@ async function importThemeLayout(themeFolderName, layoutName) {
 }
 
 async function resolveThemeLayout(themeName, layoutName, emptyLayout) {
-  let Layout = await importThemeLayout(themeName, layoutName)
+  const Layout = await importThemeLayout(themeName, layoutName)
   if (Layout) return Layout
-
-  const fallback = getFallbackThemeName(themeName)
-  if (fallback) {
-    Layout = await importThemeLayout(fallback, layoutName)
-    if (Layout) {
-      console.warn(
-        `[theme] "${themeName}" missing "${layoutName}", using fallback "${fallback}".`
-      )
-      return Layout
-    }
-  }
 
   console.warn(`[theme] "${themeName}" missing "${layoutName}", using empty layout.`)
   return emptyLayout
@@ -158,21 +154,13 @@ async function resolveThemeLayout(themeName, layoutName, emptyLayout) {
  */
 export const getThemeConfig = async themeQuery => {
   const themeName = normalizeThemeName(themeQuery)
-  let cfg = await importThemeConfig(themeName)
+  const cfg = await importThemeConfig(themeName)
   if (cfg) {
     return cfg
   }
-  const fallback = normalizeThemeName(BLOG.THEME)
-  if (fallback !== themeName) {
-    cfg = await importThemeConfig(fallback)
-    if (cfg) {
-      console.warn(
-        `[theme] "${themeName}" config unavailable, using fallback "${fallback}".`
-      )
-      return cfg
-    }
-  }
-  console.warn('[theme] No theme configuration could be loaded, using empty config.')
+  console.warn(
+    `[theme] "${themeName}" configuration unavailable, using empty config.`
+  )
   return {}
 }
 
@@ -226,9 +214,10 @@ export const useLayoutByTheme = ({ layoutName, theme }) => {
   const router = useRouter()
   const themeQuery = getCurrentTheme(router, theme)
   const cacheKey = `${themeQuery}:${layoutName}`
+  const isConfiguredTheme = themeQuery === getConfiguredThemeName()
 
   if (layoutByThemeCache.has(cacheKey)) {
-    scheduleFixThemeDOM(themeQuery === BLOG.THEME ? 80 : 240)
+    scheduleFixThemeDOM(isConfiguredTheme ? 80 : 240)
     return layoutByThemeCache.get(cacheKey)
   }
 
@@ -239,7 +228,7 @@ export const useLayoutByTheme = ({ layoutName, theme }) => {
     loading: getLayoutLoading(layoutName)
   })
   layoutByThemeCache.set(cacheKey, DynamicLayoutComponent)
-  scheduleFixThemeDOM(themeQuery === BLOG.THEME ? 80 : 240)
+  scheduleFixThemeDOM(isConfiguredTheme ? 80 : 240)
   return DynamicLayoutComponent
 }
 
