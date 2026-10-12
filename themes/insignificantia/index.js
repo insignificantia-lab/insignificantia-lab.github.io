@@ -69,17 +69,23 @@ const Layout404 = () => (
   </main>
 )
 
-// Insignificantia. v1 does not expose Search / Sign-in / Sign-up pages.
+// Insignificantia. v1 does not expose Search / Auth / Dashboard pages.
+// Keep explicit empty layouts so the theme resolver never falls back to a
+// built-in NotionNext theme for routes that are intentionally disabled.
 const EmptyLayout = () => <></>
 const LayoutSearch = EmptyLayout
+const LayoutAuth = EmptyLayout
 const LayoutSignIn = EmptyLayout
 const LayoutSignUp = EmptyLayout
+const LayoutDashboard = EmptyLayout
 
 export {
   Layout404,
   LayoutArchive,
+  LayoutAuth,
   LayoutBase,
   LayoutCategoryIndex,
+  LayoutDashboard,
   LayoutIndex,
   LayoutPostList,
   LayoutSearch,
