@@ -1,0 +1,83 @@
+name: Install Compact Mobile Archive V1.9.2 FIXED
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  compact-mobile-archive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Patch current Archive mobile layout only
+        env:
+          PATCH_SCRIPT_B64: ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCgphcmNoaXZlID0gUGF0aCgidGhlbWVzL2luc2lnbmlmaWNhbnRpYS9BcmNoaXZlU3R5bGUuanMiKQp0ZXh0ID0gYXJjaGl2ZS5yZWFkX3RleHQoZW5jb2Rpbmc9InV0Zi04IikKCm9sZF83NjAgPSAiIiIgICAgICBAbWVkaWEgKG1heC13aWR0aDogNzYwcHgpIHsKICAgICAgICAuaW5zLWFyY2hpdmUtcGFnZSB7CiAgICAgICAgICB3aWR0aDogMTAwJTsKICAgICAgICAgIG1hcmdpbi1sZWZ0OiAwOwogICAgICAgICAgbWFyZ2luLXJpZ2h0OiAwOwogICAgICAgICAgcGFkZGluZzogNTRweCAxOHB4IDg2cHg7CiAgICAgICAgICBib3gtc2l6aW5nOiBib3JkZXItYm94OwogICAgICAgIH0KCiAgICAgICAgLmlucy1hcmNoaXZlLWhlYWRlciB7CiAgICAgICAgICBtYXJnaW4tYm90dG9tOiAyOHB4OwogICAgICAgIH0KCiAgICAgICAgLmlucy1hcmNoaXZlLWdyaWQgewogICAgICAgICAgZ3JpZC10ZW1wbGF0ZS1jb2x1bW5zOiByZXBlYXQoMiwgbWlubWF4KDAsIDFmcikpOwogICAgICAgICAgZ2FwOiAxNnB4OwogICAgICAgIH0KCiAgICAgICAgLmlucy1hcmNoaXZlLXllYXItZ3JpZCB7CiAgICAgICAgICBtYXJnaW4tdG9wOiA4NnB4OwogICAgICAgIH0KCiAgICAgICAgLmlucy1hcmNoaXZlLWNhcmQgewogICAgICAgICAgcGFkZGluZzogMjBweDsKICAgICAgICB9CiAgICAgIH0KCiAgICAgIEBtZWRpYSAobWF4LXdpZHRoOiA1MjBweCkgewogICAgICAgIC5pbnMtYXJjaGl2ZS1ncmlkIHsKICAgICAgICAgIGdyaWQtdGVtcGxhdGUtY29sdW1uczogMWZyOwogICAgICAgIH0KCiAgICAgICAgLmlucy1hcmNoaXZlLWNhcmQgewogICAgICAgICAgYXNwZWN0LXJhdGlvOiAxLjMgLyAxOwogICAgICAgIH0KICAgICAgfSIiIgoKbmV3Xzc2MCA9ICIiIiAgICAgIEBtZWRpYSAobWF4LXdpZHRoOiA3NjBweCkgewogICAgICAgIC5pbnMtYXJjaGl2ZS1wYWdlIHsKICAgICAgICAgIHdpZHRoOiAxMDAlOwogICAgICAgICAgbWFyZ2luLWxlZnQ6IDA7CiAgICAgICAgICBtYXJnaW4tcmlnaHQ6IDA7CiAgICAgICAgICBwYWRkaW5nOiA1NHB4IDE4cHggODZweDsKICAgICAgICAgIGJveC1zaXppbmc6IGJvcmRlci1ib3g7CiAgICAgICAgfQoKICAgICAgICAuaW5zLWFyY2hpdmUtaGVhZGVyIHsKICAgICAgICAgIG1hcmdpbi1ib3R0b206IDI4cHg7CiAgICAgICAgfQoKICAgICAgICAuaW5zLWFyY2hpdmUtZ3JpZCB7CiAgICAgICAgICBncmlkLXRlbXBsYXRlLWNvbHVtbnM6IHJlcGVhdCgyLCBtaW5tYXgoMCwgMWZyKSk7CiAgICAgICAgICBnYXA6IDEycHg7CiAgICAgICAgfQoKICAgICAgICAuaW5zLWFyY2hpdmUteWVhci1ncmlkIHsKICAgICAgICAgIG1hcmdpbi10b3A6IDY0cHg7CiAgICAgICAgfQoKICAgICAgICAuaW5zLWFyY2hpdmUtY2FyZCB7CiAgICAgICAgICBhc3BlY3QtcmF0aW86IDEuMTggLyAxOwogICAgICAgICAgcGFkZGluZzogMTZweDsKICAgICAgICB9CgogICAgICAgIC5pbnMtYXJjaGl2ZS1jYXJkIHN0cm9uZyB7CiAgICAgICAgICBmb250LXNpemU6IGNsYW1wKDIycHgsIDYuMnZ3LCAyOHB4KTsKICAgICAgICAgIGxpbmUtaGVpZ2h0OiAxLjA4OwogICAgICAgIH0KCiAgICAgICAgLmlucy1hcmNoaXZlLWNhcmQgc21hbGwgewogICAgICAgICAgZm9udC1zaXplOiAxMHB4OwogICAgICAgICAgbGluZS1oZWlnaHQ6IDEuMzU7CiAgICAgICAgICBsZXR0ZXItc3BhY2luZzogMC4wOGVtOwogICAgICAgIH0KICAgICAgfQoKICAgICAgQG1lZGlhIChtYXgtd2lkdGg6IDUyMHB4KSB7CiAgICAgICAgLmlucy1hcmNoaXZlLWdyaWQgewogICAgICAgICAgZ3JpZC10ZW1wbGF0ZS1jb2x1bW5zOiByZXBlYXQoMiwgbWlubWF4KDAsIDFmcikpOwogICAgICAgICAgZ2FwOiAxMnB4OwogICAgICAgIH0KCiAgICAgICAgLmlucy1hcmNoaXZlLWNhcmQgewogICAgICAgICAgYXNwZWN0LXJhdGlvOiAxLjE4IC8gMTsKICAgICAgICAgIHBhZGRpbmc6IDE2cHg7CiAgICAgICAgfQoKICAgICAgICAuaW5zLWFyY2hpdmUtY2FyZCBzdHJvbmcgewogICAgICAgICAgZm9udC1zaXplOiBjbGFtcCgyMXB4LCA2LjR2dywgMjVweCk7CiAgICAgICAgfQogICAgICB9IiIiCgppZiBvbGRfNzYwIG5vdCBpbiB0ZXh0OgogICAgcmFpc2UgU3lzdGVtRXhpdCgKICAgICAgICAiRVJST1I6IGV4cGVjdGVkIFYxLjkuMSBBcmNoaXZlIG1vYmlsZSBibG9jayB3YXMgbm90IGZvdW5kLiAiCiAgICAgICAgIlJlZnVzaW5nIHRvIG92ZXJ3cml0ZSBhbiB1bmtub3duIG5ld2VyIGxheW91dC4iCiAgICApCgphcmNoaXZlLndyaXRlX3RleHQodGV4dC5yZXBsYWNlKG9sZF83NjAsIG5ld183NjApLCBlbmNvZGluZz0idXRmLTgiKQoKb3ZlcnJpZGVzID0gUGF0aCgidGhlbWVzL2luc2lnbmlmaWNhbnRpYS9JbnRlZ3JhdGlvbk92ZXJyaWRlcy5qcyIpCm90ZXh0ID0gb3ZlcnJpZGVzLnJlYWRfdGV4dChlbmNvZGluZz0idXRmLTgiKQoKb2xkX292ZXJyaWRlID0gIiIiICAgICAgICAjdGhlbWUtaW5zaWduaWZpY2FudGlhIC5pbnMtYXJjaGl2ZS1jYXJkIHsKICAgICAgICAgIHBhZGRpbmctbGVmdDogMjBweCAhaW1wb3J0YW50OwogICAgICAgICAgcGFkZGluZy1yaWdodDogMjBweCAhaW1wb3J0YW50OwogICAgICAgIH0iIiIKCm5ld19vdmVycmlkZSA9ICIiIiAgICAgICAgI3RoZW1lLWluc2lnbmlmaWNhbnRpYSAuaW5zLWFyY2hpdmUtY2FyZCB7CiAgICAgICAgICBwYWRkaW5nOiAxNnB4ICFpbXBvcnRhbnQ7CiAgICAgICAgfSIiIgoKaWYgb2xkX292ZXJyaWRlIG5vdCBpbiBvdGV4dDoKICAgIHJhaXNlIFN5c3RlbUV4aXQoCiAgICAgICAgIkVSUk9SOiBleHBlY3RlZCBWMS45LjEgQXJjaGl2ZSBvdmVycmlkZSB3YXMgbm90IGZvdW5kLiAiCiAgICAgICAgIlJlZnVzaW5nIHRvIG92ZXJ3cml0ZSBhbiB1bmtub3duIG5ld2VyIG92ZXJyaWRlLiIKICAgICkKCm92ZXJyaWRlcy53cml0ZV90ZXh0KAogICAgb3RleHQucmVwbGFjZShvbGRfb3ZlcnJpZGUsIG5ld19vdmVycmlkZSksCiAgICBlbmNvZGluZz0idXRmLTgiCikK
+        run: |
+          set -euxo pipefail
+          echo "$PATCH_SCRIPT_B64" | base64 --decode > /tmp/patch_archive_v192.py
+          python /tmp/patch_archive_v192.py
+
+      - name: Verify compact two-column mobile Archive
+        run: |
+          set -euxo pipefail
+          grep -F "grid-template-columns: repeat(2, minmax(0, 1fr));" themes/insignificantia/ArchiveStyle.js
+          grep -F "gap: 12px;" themes/insignificantia/ArchiveStyle.js
+          grep -F "aspect-ratio: 1.18 / 1;" themes/insignificantia/ArchiveStyle.js
+          grep -F "font-size: clamp(21px, 6.4vw, 25px);" themes/insignificantia/ArchiveStyle.js
+          grep -F "padding: 16px !important;" themes/insignificantia/IntegrationOverrides.js
+
+          if grep -A4 "@media (max-width: 520px)" themes/insignificantia/ArchiveStyle.js | grep -F "grid-template-columns: 1fr;"; then
+            echo "ERROR: one-column phone override still exists."
+            exit 1
+          fi
+
+          echo "Compact mobile Archive verified locally."
+
+      - name: Commit and push safely
+        run: |
+          set -euxo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add themes/insignificantia/ArchiveStyle.js themes/insignificantia/IntegrationOverrides.js
+
+          if git diff --cached --quiet; then
+            echo "No V1.9.2 changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Compact Archive cards on mobile"
+
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+
+            if git push origin HEAD:main; then
+              echo "Push succeeded."
+              break
+            fi
+
+            if [ "$attempt" = "3" ]; then
+              echo "Push failed after 3 attempts."
+              exit 1
+            fi
+
+            sleep 3
+          done
+
+      - name: Verify remote main
+        run: |
+          set -euxo pipefail
+          git fetch origin main
+          git show origin/main:themes/insignificantia/ArchiveStyle.js | grep -F "aspect-ratio: 1.18 / 1;"
+          git show origin/main:themes/insignificantia/ArchiveStyle.js | grep -F "gap: 12px;"
+          git show origin/main:themes/insignificantia/IntegrationOverrides.js | grep -F "padding: 16px !important;"
+          echo "REMOTE MAIN VERIFIED: Compact Mobile Archive V1.9.2 FIXED is present."
