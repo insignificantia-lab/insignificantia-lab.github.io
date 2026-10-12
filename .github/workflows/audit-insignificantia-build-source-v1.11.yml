@@ -1,0 +1,207 @@
+name: Audit Insignificantia Build Source V1.11
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
+      NEXT_PUBLIC_THEME: insignificantia
+      NEXT_PUBLIC_THEME_SWITCH: "false"
+      NEXT_PUBLIC_LINK: https://${{ github.repository_owner }}.github.io
+      BUILD_PREFETCH_ENABLED: "false"
+      STATIC_PAGE_GENERATION_TIMEOUT: "600"
+      NEXT_PUBLIC_WIDGET_PET: "false"
+      NEXT_PUBLIC_WIDGET_PET_SWITCH_THEME: "false"
+      NEXT_PUBLIC_POSTS_PER_PAGE: "15"
+
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Inspect current source and deploy workflow
+        shell: bash
+        run: |
+          set -u
+
+          echo "===== CURRENT MAIN ====="
+          git rev-parse HEAD
+          git log -1 --oneline --decorate
+
+          echo
+          echo "===== V1.11 SOURCE MARKERS ====="
+          grep -n "data-safe-frame='article-list-v1.11'" \
+            themes/insignificantia/components/ArticleListPage.js || true
+          grep -n "data-safe-frame='archive-v1.11'" \
+            themes/insignificantia/components/ArchivePage.js || true
+          grep -n "data-safe-frame='article-detail-v1.11'" \
+            themes/insignificantia/components/ArticleDetailPage.js || true
+
+          echo
+          echo "===== THEME LAYOUT MAPPING ====="
+          grep -n -E \
+            "LayoutPostList|LayoutArchive|LayoutCategoryIndex|LayoutTagIndex|LayoutSlug|ArticleListPage|ArchivePage|ArticleDetailPage" \
+            themes/insignificantia/index.js || true
+
+          echo
+          echo "===== DEPLOY WORKFLOW FILE ====="
+          DEPLOY_FILE="$(grep -RIl \
+            "Deploy NotionNext to GitHub Pages" \
+            .github/workflows 2>/dev/null | head -n 1 || true)"
+
+          if [ -n "$DEPLOY_FILE" ]; then
+            echo "Deploy workflow: $DEPLOY_FILE"
+            sed -n '1,260p' "$DEPLOY_FILE"
+          else
+            echo "Could not locate the Pages deploy workflow by name."
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Yarn 1
+        run: npm install -g yarn@1.22.22
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Export current main without deploying
+        run: yarn export
+
+      - name: Audit exported output
+        shell: bash
+        run: |
+          set -u
+
+          REPORT="insignificantia-build-audit.txt"
+          : > "$REPORT"
+
+          write() {
+            echo "$1" | tee -a "$REPORT"
+          }
+
+          HEAD_SHA="$(git rev-parse HEAD)"
+          write "Insignificantia build-source audit"
+          write "HEAD=$HEAD_SHA"
+          write ""
+
+          check_source() {
+            label="$1"
+            file="$2"
+            marker="$3"
+            if grep -Fq "$marker" "$file"; then
+              write "SOURCE_${label}=YES"
+            else
+              write "SOURCE_${label}=NO"
+            fi
+          }
+
+          check_output() {
+            label="$1"
+            marker="$2"
+
+            if grep -R -F -q "$marker" out 2>/dev/null; then
+              write "OUTPUT_${label}=YES"
+              write "OUTPUT_${label}_FILES:"
+              grep -R -F -l "$marker" out 2>/dev/null \
+                | head -n 20 \
+                | tee -a "$REPORT" || true
+            else
+              write "OUTPUT_${label}=NO"
+            fi
+          }
+
+          check_source \
+            ARTICLE_LIST \
+            themes/insignificantia/components/ArticleListPage.js \
+            "article-list-v1.11"
+
+          check_source \
+            ARCHIVE \
+            themes/insignificantia/components/ArchivePage.js \
+            "archive-v1.11"
+
+          check_source \
+            ARTICLE_DETAIL \
+            themes/insignificantia/components/ArticleDetailPage.js \
+            "article-detail-v1.11"
+
+          write ""
+
+          check_output ARTICLE_LIST "article-list-v1.11"
+          check_output ARCHIVE "archive-v1.11"
+          check_output ARTICLE_DETAIL "article-detail-v1.11"
+
+          write ""
+          write "===== DIRECT HTML CHECKS ====="
+
+          if [ -f out/page/1.html ]; then
+            ARTICLE_HTML="out/page/1.html"
+          elif [ -f out/page/1/index.html ]; then
+            ARTICLE_HTML="out/page/1/index.html"
+          else
+            ARTICLE_HTML=""
+          fi
+
+          if [ -n "$ARTICLE_HTML" ]; then
+            write "ARTICLE_HTML=$ARTICLE_HTML"
+            grep -n -F "article-list-v1.11" "$ARTICLE_HTML" \
+              | head -n 5 \
+              | tee -a "$REPORT" || true
+          else
+            write "ARTICLE_HTML=NOT_FOUND"
+          fi
+
+          if [ -f out/archive.html ]; then
+            ARCHIVE_HTML="out/archive.html"
+          elif [ -f out/archive/index.html ]; then
+            ARCHIVE_HTML="out/archive/index.html"
+          else
+            ARCHIVE_HTML=""
+          fi
+
+          if [ -n "$ARCHIVE_HTML" ]; then
+            write "ARCHIVE_HTML=$ARCHIVE_HTML"
+            grep -n -F "archive-v1.11" "$ARCHIVE_HTML" \
+              | head -n 5 \
+              | tee -a "$REPORT" || true
+          else
+            write "ARCHIVE_HTML=NOT_FOUND"
+          fi
+
+          write ""
+          write "===== INTERPRETATION ====="
+
+          SRC_COUNT="$(grep -c '=YES' "$REPORT" | head -n 1 || true)"
+          OUT_COUNT="$(grep -c '^OUTPUT_.*=YES$' "$REPORT" || true)"
+
+          if grep -q '^SOURCE_ARTICLE_LIST=NO$' "$REPORT" \
+            || grep -q '^SOURCE_ARCHIVE=NO$' "$REPORT" \
+            || grep -q '^SOURCE_ARTICLE_DETAIL=NO$' "$REPORT"; then
+            write "RESULT=V1.11 is not fully present in current main."
+          elif [ "$OUT_COUNT" -eq 0 ]; then
+            write "RESULT=V1.11 is in source but not in exported output."
+            write "NEXT=Inspect DynamicLayout/theme resolution and fallback behavior."
+          else
+            write "RESULT=V1.11 markers are present in the exported build."
+            write "NEXT=If live Pages still shows no change, the Pages deployment is serving another/stale artifact or commit."
+          fi
+
+          echo
+          cat "$REPORT"
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: insignificantia-build-audit
+          path: insignificantia-build-audit.txt
