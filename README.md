@@ -83,7 +83,7 @@ NotionNext 是一个基于 **Next.js + Notion API** 的开源站点系统。你�
 
 - 在线切换主题：[preview.tangly1024.com](https://preview.tangly1024.com/)
 - 26 个内置主题：[主题全览](https://notionnext.tangly1024.com/user-guide/themes/THEMES_CATALOG)
-- 仓库内主题文档：[docs/user-guide/themes/](./docs/user-guide/themes/)
+- 主题文档：[NotionNext 公开文档站](https://notionnext.tangly1024.com/user-guide/themes/THEMES_CATALOG)
 
 | 场景 | 优先看 |
 | --- | --- |
@@ -119,12 +119,10 @@ yarn dev
 | `yarn dev` | 启动本地开发 |
 | `yarn build` | 构建生产版本 |
 | `yarn export` | 静态导出 |
-| `yarn docs:site:dev` | 本地预览文档站 |
-| `yarn docs:site:build` | 构建文档站 |
 
 ## 文档入口
 
-自 2026 年起，NotionNext 使用仓库内 Markdown 文档作为主要教程来源，并发布为独立文档站。
+Insignificantia 实验仓库不维护独立的 VitePress 文档站；NotionNext 的通用使用说明继续参考上游公开文档。Insignificantia 自身的正式开发与部署规范由项目版本化技术文档维护。
 
 | 内容 | 链接 |
 | --- | --- |
@@ -134,7 +132,6 @@ yarn dev
 | 配置索引 | [全站功能与配置索引](https://notionnext.tangly1024.com/user-guide/reference/features) |
 | 主题说明 | [26 个主题说明](https://notionnext.tangly1024.com/user-guide/themes/THEMES_CATALOG) |
 | 用户作品 | [Showcase](https://notionnext.tangly1024.com/user-guide/showcase)：已上线站点欢迎提交作品 |
-| 文档源码 | [docs/](./docs/) |
 | 旧版手册 | [docs.tangly1024.com](https://docs.tangly1024.com/) |
 
 ## 参与社区
@@ -143,8 +140,8 @@ NotionNext 主仓库由 GitHub 组织 [notionnext-org](https://github.com/notion
 
 | 内容 | 链接 |
 | --- | --- |
-| 参与社区 | [community-participate.md](./docs/user-guide/community-participate.md) |
-| 5.0 愿景与路线图 | [VISION_ROADMAP.md](./docs/developer/VISION_ROADMAP.md) |
+| 参与社区 | [上游 community-participate.md](https://github.com/notionnext-org/NotionNext/blob/main/docs/user-guide/community-participate.md) |
+| 5.0 愿景与路线图 | [上游 VISION_ROADMAP.md](https://github.com/notionnext-org/NotionNext/blob/main/docs/developer/VISION_ROADMAP.md) |
 | 贡献指南 | [CONTRIBUTING.zh-CN.md](./CONTRIBUTING.zh-CN.md) |
 | 项目治理 | [GOVERNANCE.zh-CN.md](./GOVERNANCE.zh-CN.md) |
 | 维护者 | [MAINTAINERS.md](./MAINTAINERS.md) |

@@ -83,7 +83,7 @@ New users should start with the [Get Started guide](https://notionnext.tangly102
 
 - Live theme switcher: [preview.tangly1024.com](https://preview.tangly1024.com/)
 - Built-in themes: [Themes catalog](https://notionnext.tangly1024.com/user-guide/themes/THEMES_CATALOG)
-- Theme docs in this repository: [docs/user-guide/themes/](./docs/user-guide/themes/)
+- Theme documentation: [NotionNext public docs](https://notionnext.tangly1024.com/user-guide/themes/THEMES_CATALOG)
 
 | Use Case | Start With |
 | --- | --- |
@@ -112,10 +112,10 @@ Common commands:
 | `yarn dev` | Start local development |
 | `yarn build` | Build for production |
 | `yarn export` | Static export |
-| `yarn docs:site:dev` | Preview the docs site locally |
-| `yarn docs:site:build` | Build the docs site |
 
 ## Documentation
+
+This Insignificantia experimental repository does not maintain a separate VitePress docs site. General NotionNext usage continues to reference the upstream public documentation; Insignificantia's formal development and deployment process is maintained in its versioned project specification.
 
 | Content | Link |
 | --- | --- |
@@ -125,7 +125,6 @@ Common commands:
 | Configuration index | [Features and configuration](https://notionnext.tangly1024.com/user-guide/reference/features) |
 | Theme docs | [26 built-in themes](https://notionnext.tangly1024.com/user-guide/themes/THEMES_CATALOG) |
 | Showcase | [User websites](https://notionnext.tangly1024.com/user-guide/showcase): submit your site after launch |
-| Docs source | [docs/](./docs/) |
 
 ## Community
 
@@ -133,8 +132,8 @@ The canonical repository is maintained by [notionnext-org](https://github.com/no
 
 | Content | Link |
 | --- | --- |
-| Community guide | [community-participate.md](./docs/user-guide/community-participate.md) |
-| Vision and roadmap | [VISION_ROADMAP.md](./docs/developer/VISION_ROADMAP.md) |
+| Community guide | [upstream community-participate.md](https://github.com/notionnext-org/NotionNext/blob/main/docs/user-guide/community-participate.md) |
+| Vision and roadmap | [upstream VISION_ROADMAP.md](https://github.com/notionnext-org/NotionNext/blob/main/docs/developer/VISION_ROADMAP.md) |
 | Contributing | [CONTRIBUTING.md](./CONTRIBUTING.md) |
 | Governance | [GOVERNANCE.md](./GOVERNANCE.md) |
 | Maintainers | [MAINTAINERS.md](./MAINTAINERS.md) |
