@@ -1,537 +1,134 @@
-# 部署指南
+# Insignificantia. 部署指南
 
-## 概述
+> 本文件只描述 Insignificantia. 当前生产链。通用 NotionNext 的 Vercel、Netlify、EdgeOne、Docker/GHCR 等部署方式不属于本实验产品的正式架构。
 
-NotionNext 支持多种部署方式，本指南将详细介绍各种部署选项和最佳实践。
+## 1. 生产架构
 
-## 部署前准备
+当前唯一正式发布路径为：
 
-### 0. 本地统一基线（推荐）
-
-为提升跨平台兼容性（Vercel / Cloudflare Pages / Netlify / EdgeOne Pages 等），本项目建议统一使用以下最简流程：
-
-```bash
-# Node 22（版本以仓库根目录 `.nvmrc` 为准，便于与各平台预装列表对齐）
-nvm use || nvm install
-
-# Yarn
-npm i -g yarn
-
-# 安装依赖 / 本地开发 / 构建
-yarn
-yarn dev
-yarn build
+```text
+Private Notion
+  → 人工筛选 / 移入 Published Database
+  → Notion 事件
+  → Cloudflare Worker
+  → GitHub workflow_dispatch
+  → .github/workflows/deploy-pages.yml
+  → yarn export
+  → GitHub Pages
 ```
 
-### 1. 环境变量配置
+GitHub Pages 是生产托管端。Cloudflare Worker 只负责验证 Notion 请求并触发 GitHub Actions，不负责托管博客本体。
 
-创建 `.env.local` 文件并配置必要的环境变量：
+## 2. 固定运行基线
 
-```bash
-# 必需配置
-NOTION_PAGE_ID=your-notion-page-id
+- Node.js: 22
+- Yarn: 1.22.22
+- Production theme: `insignificantia`
+- Production host: GitHub Pages
+- Production workflow: `.github/workflows/deploy-pages.yml`
+- Published content source: 独立的 Published Notion Database
 
-# 推荐配置
-NEXT_PUBLIC_TITLE=你的博客标题
-NEXT_PUBLIC_DESCRIPTION=你的博客描述
-NEXT_PUBLIC_AUTHOR=作者名称
-NEXT_PUBLIC_LINK=https://yourdomain.com
+不要把 Private Notion 工作区直接接入公开站点。
 
-# 可选配置
-REDIS_URL=redis://localhost:6379
-NEXT_PUBLIC_ANALYTICS_GOOGLE_ID=G-XXXXXXXXXX
+## 3. GitHub Pages 工作流
+
+`deploy-pages.yml` 使用 `workflow_dispatch` 触发，并完成以下步骤：
+
+1. Checkout repository
+2. Setup Node.js 22
+3. Install Yarn 1.22.22
+4. `yarn install --frozen-lockfile`
+5. `yarn export`
+6. 为 `out/` 添加 `.nojekyll`
+7. 上传 GitHub Pages artifact
+8. 使用 GitHub 官方 Pages action 部署
+
+生产构建所需的 Notion 数据入口通过 GitHub Actions Secret `NOTION_PAGE_ID` 提供。不得把真实 ID 或任何 Secret 写入源码、提交记录、Issue、日志示例或本文档。
+
+当前生产工作流还显式固定：
+
+```text
+NEXT_PUBLIC_THEME=insignificantia
+NEXT_PUBLIC_THEME_SWITCH=false
+NEXT_PUBLIC_WIDGET_PET=false
+NEXT_PUBLIC_WIDGET_PET_SWITCH_THEME=false
+NEXT_PUBLIC_POSTS_PER_PAGE=15
+BUILD_PREFETCH_ENABLED=false
+STATIC_PAGE_GENERATION_TIMEOUT=600
 ```
 
-### 2. 构建测试
+这些值属于当前产品基线；调整时应单独审计并重新执行完整 Pages 验收。
 
-在部署前确保项目能够正常构建：
+## 4. 手动发布
 
-```bash
-yarn build
-yarn start
+需要人工重新发布时：
+
+1. 打开 GitHub repository 的 Actions。
+2. 选择 `Deploy NotionNext to GitHub Pages`。
+3. 使用 `Run workflow`，分支选择 `main`。
+4. 确认 build 与 deploy 两个阶段均成功。
+5. 检查线上首页、ARTICLE、ARCHIVE、ABOUT 与文章详情页。
+
+手动发布是 Cloudflare 自动链失效时的正式回退方案。
+
+## 5. Notion → Cloudflare Worker → GitHub 自动触发
+
+自动链只负责“通知 GitHub 重新构建”，不改变内容审核模型：只有已经人工确认并进入 Published Database 的内容才应影响公开站点。
+
+Worker 的职责顺序应保持为：
+
+1. 接收 Notion 请求。
+2. 使用原始 request body 进行签名校验。
+3. 使用 `NOTION_VERIFICATION_TOKEN` 完成 HMAC SHA-256 验证。
+4. 过滤不需要触发发布的事件。
+5. 调用 GitHub Actions API，对 `deploy-pages.yml` 的 `main` ref 发起 `workflow_dispatch`。
+6. 只返回必要状态，不输出任何 Secret。
+
+Cloudflare Worker 中需要的敏感值以 Secret 形式保存，例如：
+
+```text
+GITHUB_TOKEN
+NOTION_VERIFICATION_TOKEN
 ```
 
-### 3. 质量检查
+这里只记录变量名，不记录值。GitHub Token 应限制在目标仓库，并只授予触发 Actions 所需的最小权限。
 
-运行完整的质量检查：
+完整的 Worker 创建、Notion verification、签名验证、Token 权限与故障排查步骤，以《Insignificantia. 技术与设计规格》的最新正式版本为准。
 
-```bash
-yarn quality
-```
+## 6. 发布验收
 
-## Vercel 部署（推荐）
+每次影响生产构建、依赖、路由、主题或数据读取方式的改动，至少确认：
 
-Vercel 是 Next.js 的官方部署平台，提供最佳的性能和开发体验。
+- CI: Lint & type-check 通过
+- CI: Unit tests 通过
+- CI: Lockfile consistency 通过
+- CodeQL 通过
+- `deploy-pages.yml` build 成功
+- Pages artifact 上传成功
+- GitHub Pages deploy 成功
+- 首页可访问
+- ARTICLE 分页正常，每页 15 篇
+- ARCHIVE 正常
+- ABOUT 正常
+- 文章详情页正常
+- `themes/insignificantia` 正常加载
+- PET 与主题切换保持关闭
+- Published Database 之外的私人内容不会进入公开站点
 
-### 自动部署
+## 7. 回滚原则
 
-1. **连接 GitHub**
-   - 访问 [Vercel](https://vercel.com)
-   - 使用 GitHub 账号登录
-   - 导入你的 NotionNext 仓库
+如果某次改动导致构建或线上页面异常：
 
-2. **配置环境变量**
-   - 在 Vercel 项目设置中添加环境变量
-   - 至少需要配置 `NOTION_PAGE_ID`
+1. 确认最后一个已验收成功的 commit。
+2. 回滚问题改动或恢复对应文件。
+3. 重新执行 CI / CodeQL。
+4. 重新手动运行 `deploy-pages.yml`。
+5. 线上验收通过后再继续下一波瘦身。
 
-3. **部署**
-   - Vercel 会自动检测 Next.js 项目
-   - 每次推送到主分支都会自动部署
+不要通过修改 Notion 私有内容、泄露 Secret、临时切换生产主题或启用已冻结功能来规避构建问题。
 
-### 手动部署
+## 8. Docker / GHCR 状态
 
-```bash
-# 安装 Vercel CLI
-npm i -g vercel
+Insignificantia. 不使用 Docker 或 GHCR 作为生产、备份或自动发布路径。Wave D 后仓库不再维护 Dockerfile、Docker ignore 或 GHCR image workflow。
 
-# 登录
-vercel login
-
-# 部署
-vercel
-
-# 生产部署
-vercel --prod
-```
-
-### Vercel 配置文件
-
-创建 `vercel.json` 文件进行高级配置：
-
-```json
-{
-  "framework": "nextjs",
-  "buildCommand": "yarn build",
-  "outputDirectory": ".next",
-  "installCommand": "yarn",
-  "functions": {
-    "pages/api/**/*.js": {
-      "maxDuration": 30
-    }
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/feed",
-      "destination": "/rss.xml",
-      "permanent": true
-    }
-  ]
-}
-```
-
-## Netlify 部署
-
-### 自动部署
-
-1. **连接仓库**
-   - 访问 [Netlify](https://netlify.com)
-   - 连接你的 GitHub 仓库
-
-2. **构建设置**
-   - Build command: `yarn build`
-   - Publish directory: `out`
-   - 环境变量: `EXPORT=true`
-
-3. **环境变量配置**
-   - 在 Netlify 设置中添加环境变量
-
-### 手动部署
-
-```bash
-# 构建静态文件
-yarn export
-
-# 安装 Netlify CLI
-npm install -g netlify-cli
-
-# 登录
-netlify login
-
-# 部署
-netlify deploy --dir=out
-
-# 生产部署
-netlify deploy --prod --dir=out
-```
-
-### Netlify 配置文件
-
-创建 `netlify.toml` 文件：
-
-```toml
-[build]
-  command = "yarn export"
-  publish = "out"
-
-[build.environment]
-  EXPORT = "true"
-  NODE_VERSION = "18"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-
-[[redirects]]
-  from = "/feed"
-  to = "/rss.xml"
-  status = 301
-```
-
-## 腾讯云 EdgeOne Pages
-
-EdgeOne 构建阶段会按仓库中的 `.nvmrc` 切换 Node 版本。若控制台报错类似 **Failed to switch to Node.js x.y.z**，通常是因为平台上 **未提供该版本**。
-
-处理方式：
-
-1. **保持上游**：拉取最新 NotionNext，确认 `.nvmrc` 已与 EdgeOne「项目设置 → Node.js 版本」下拉列表中可选版本一致。
-2. **自建仓库**：在 EdgeOne 控制台选择与 `.nvmrc` **完全一致**的 Node 版本；仍失败时检查构建日志是否仍在读取旧的 `.nvmrc`（需推送后再构建）。
-3. `package.json` 中 `engines.node` 为 `>=22 <25`；关键是 **构建环境实际安装的版本**能解析 `.nvmrc`。
-
-**兼容尝试（按顺序，任选其一即可，不必全做）：**
-
-| 尝试 | 做法 |
-|------|------|
-| A. 对齐版本 | 打开 EdgeOne **项目设置 → Node.js 版本**，选择与仓库根目录 **`.nvmrc` 完全一致**的一项，保存后 **重新部署**。 |
-| B. 改自建 fork | 若平台下拉列表**没有**当前 `.nvmrc` 里的版本：把 fork 里的 `.nvmrc` 改成平台**已有**的 Node 22 版本，推送后再构建。 |
-| C. 清缓存 / 换分支 | 确认构建日志里 **Switching node** 读到的版本已更新；关闭「使用构建缓存」或触发一次无缓存构建，排除旧 `.nvmrc` 缓存。 |
-| D. `engines` 报错时 | 若日志是 **Yarn does not satisfy engine** 而非 **Switching node**：在构建环境设 `YARN_IGNORE_ENGINES=1`（仅当确为 engines 校验问题时使用）。 |
-| E. 按平台要求写版本 | 若平台不支持 `.nvmrc` 仅写 `22`，改为平台支持的 Node 22 完整版本号。 |
-
-说明：Next.js 14 与当前依赖不要求锁在某一补丁版本；**兼容的核心是「平台实际能装上的 Node」与「`.nvmrc` / 控制台选择」一致**。
-
-构建命令与静态导出等与其它平台相同，按需配置环境变量（至少 `NOTION_PAGE_ID`）。
-
-### `yarn install` 报 `ENOSPC: no space left on device`
-
-与 **Node 版本** 无关（日志里已出现正确 Node 版本即表示切换成功）。错误 **`ENOSPC`** 表示构建机 **磁盘或 `/dev/shm`（内存盘）空间不足**，在安装依赖从 cache 拷贝到 `node_modules` 时写满。
-
-**可尝试：**
-
-1. **向 EdgeOne / 腾讯云工单反馈**：说明构建任务在 `yarn install` 阶段 `ENOSPC`，申请更大构建盘或确认是否为平台侧临时配额。  
-2. **减少单次写入体积**（若控制台支持自定义安装命令）：  
-   - 使用 `yarn install --frozen-lockfile --prefer-offline` 且**开启依赖缓存**（命中缓存时少下载）；或  
-   - 在构建前增加 `yarn cache clean`（会多下载，仅当怀疑缓存损坏时尝试，**不一定**缓解 ENOSPC）。  
-3. **自定义 Yarn 缓存目录**（若平台文档支持挂载更大分区）：设置环境变量 **`YARN_CACHE_FOLDER`** 到有足够剩余空间的路径（具体以 EdgeOne 构建环境说明为准）。  
-4. **换构建方案**：在磁盘更大的 CI（如 GitHub Actions）完成 `yarn build` / `next build`，将产物同步到 EdgeOne（仅静态托管），绕过 Pages 内置构建机容量限制。
-
-**备选：怀疑「构建/文件缓存」把空间占满时**
-
-| 做法 | 适用阶段 | 说明 |
-|------|----------|------|
-| **关闭 EdgeOne「依赖/构建缓存」再构建** | `yarn install` 前后 | 若平台在恢复缓存后又解压一份 `node_modules`，可能出现「缓存 + 工作区」双份占用 **`/dev/shm`**。在控制台**关闭缓存恢复**后重试（构建会变慢，但有时能腾出空间；视平台实现而定）。 |
-| **`YARN_CACHE_FOLDER` 指到大磁盘路径** | `yarn install` | 避免 Yarn 默认缓存与仓库同落在小容量分区；路径以 **EdgeOne 官方文档** 为准。 |
-| **构建环境变量 `ENABLE_CACHE=false`** | **`next build` 阶段** | 关闭 Notion 数据**读**盘缓存为主，会**增加 Notion 请求与耗时**；**锁文件/会话目录仍可能写入**。对日志里 **`yarn install` 拷贝 `node_modules` 即失败**的 ENOSPC **通常无效**，因尚未执行到 Next 构建。 |
-
-仓库本身无法通过改 `package.json` 消除平台磁盘上限；根本解决依赖 **构建环境配额** 或 **外置构建**。
-
-## Docker 部署
-
-### Dockerfile
-
-```dockerfile
-FROM node:18-alpine AS base
-
-# Install dependencies only when needed
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
-
-COPY package.json package-lock.json* ./
-RUN npm ci
-
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN yarn build
-
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
-
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-
-# Automatically leverage output traces to reduce image size
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT 3000
-
-CMD ["node", "server.js"]
-```
-
-### Docker Compose
-
-```yaml
-version: '3.8'
-
-services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - NOTION_PAGE_ID=${NOTION_PAGE_ID}
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - redis
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    restart: unless-stopped
-
-volumes:
-  redis_data:
-```
-
-### 部署命令
-
-```bash
-# 构建镜像
-docker build -t notionnext .
-
-# 运行容器
-docker run -p 3000:3000 -e NOTION_PAGE_ID=your-id notionnext
-
-# 使用 Docker Compose
-docker-compose up -d
-```
-
-## 静态导出部署
-
-适用于 GitHub Pages、Cloudflare Pages 等静态托管服务。
-
-### 构建静态文件
-
-```bash
-yarn export
-```
-
-若构建出现 Notion API 过慢或 `timeout of 300 seconds`，可在平台环境变量中配置 `BUILD_PREFETCH_ENABLED`、`STATIC_PAGE_GENERATION_TIMEOUT` 等，详见 [docs/user-guide/deploy/build-tuning.md](docs/user-guide/deploy/build-tuning.md)。
-
-### GitHub Pages 部署
-
-1. **GitHub Actions 配置**
-
-创建 `.github/workflows/deploy.yml`：
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build
-      run: yarn export
-      env:
-        NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
-        
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./out
-```
-
-2. **配置 Secrets**
-   - 在 GitHub 仓库设置中添加 `NOTION_PAGE_ID`
-
-## 性能优化
-
-### 1. 缓存配置
-
-```bash
-# Redis 缓存
-REDIS_URL=redis://localhost:6379
-
-# 内存缓存
-ENABLE_CACHE=true
-```
-
-### 2. CDN 配置
-
-```bash
-# 图片 CDN
-NEXT_PUBLIC_IMAGE_CDN=https://cdn.example.com
-
-# 静态资源 CDN
-NEXT_PUBLIC_STATIC_CDN=https://static.example.com
-```
-
-### 3. 压缩优化
-
-```bash
-# 启用压缩
-NEXT_PUBLIC_COMPRESS=true
-
-# 图片优化
-NEXT_PUBLIC_IMAGE_OPTIMIZE=true
-```
-
-## 监控和日志
-
-### 1. 错误监控
-
-```bash
-# Sentry
-NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn
-
-# LogRocket
-NEXT_PUBLIC_LOGROCKET_ID=your-logrocket-id
-```
-
-### 2. 性能监控
-
-```bash
-# Vercel Analytics
-NEXT_PUBLIC_VERCEL_ANALYTICS=true
-
-# Google Analytics
-NEXT_PUBLIC_ANALYTICS_GOOGLE_ID=G-XXXXXXXXXX
-```
-
-## 故障排除
-
-### 常见问题
-
-1. **构建失败**
-   ```bash
-   # 清理缓存
-   yarn clean
-   rm -rf node_modules package-lock.json
-   yarn
-   yarn build
-   ```
-
-2. **环境变量问题**
-   ```bash
-   # 检查环境变量
-   yarn quality
-   ```
-
-3. **内存不足**
-   ```bash
-   # 增加 Node.js 内存限制
-   NODE_OPTIONS="--max-old-space-size=4096" yarn build
-   ```
-
-### 调试模式
-
-```bash
-# 启用调试
-DEBUG=* yarn build
-
-# Next.js 调试
-NEXT_DEBUG=true yarn dev
-```
-
-## 安全检查清单
-
-- [ ] 环境变量已正确配置
-- [ ] 敏感信息未暴露在客户端
-- [ ] HTTPS 已启用
-- [ ] 安全头部已配置
-- [ ] 依赖包无安全漏洞
-- [ ] 访问日志已启用
-- [ ] 错误监控已配置
-
-## 备份和恢复
-
-### 数据备份
-
-```bash
-# 备份数据（按你的脚本体系执行）
-# 例如：node scripts/backup-notion.js
-
-# 备份配置文件
-tar -czf config-backup.tar.gz .env.local blog.config.js
-```
-
-### 恢复流程
-
-1. 恢复代码仓库
-2. 恢复环境变量配置
-3. 重新部署应用
-4. 验证功能正常
-
-## 更新和维护
-
-### 定期维护
-
-```bash
-# 检查依赖更新
-yarn check-updates
-
-# 更新依赖
-yarn upgrade
-
-# 安全审计
-yarn audit
-
-# 性能分析
-yarn bundle-report
-```
-
-### 版本升级
-
-1. 备份当前版本
-2. 更新代码
-3. 测试新功能
-4. 部署到生产环境
-5. 监控运行状态
+如果未来确实需要容器部署，应把它视为新的架构决策重新设计，而不是恢复历史 NotionNext Docker 文件。
