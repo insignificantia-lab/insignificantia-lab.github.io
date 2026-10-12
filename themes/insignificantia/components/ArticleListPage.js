@@ -97,7 +97,7 @@ const ArticleListPage = ({
     }
 
     return pageNumber === 1
-      ? '/article'
+      ? '/page/1'
       : `/page/${pageNumber}`
   }
 

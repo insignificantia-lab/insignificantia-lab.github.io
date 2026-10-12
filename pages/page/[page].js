@@ -18,13 +18,17 @@ const Page = props => {
 export async function getStaticPaths({ locale }) {
   const from = 'page-paths'
   const { postCount, NOTION_CONFIG } = await fetchGlobalAllData({ from, locale })
-  const totalPages = Math.ceil(
-    postCount / siteConfig('POSTS_PER_PAGE', null, NOTION_CONFIG)
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      postCount / siteConfig('POSTS_PER_PAGE', null, NOTION_CONFIG)
+    )
   )
   return {
-    // remove first page, we 're not gonna handle that.
-    paths: Array.from({ length: totalPages - 1 }, (_, i) => ({
-      params: { page: '' + (i + 2) }
+    // Insignificantia. uses the native pagination route for ARTICLE,
+    // including page 1 at /page/1.
+    paths: Array.from({ length: totalPages }, (_, i) => ({
+      params: { page: '' + (i + 1) }
     })),
     fallback: true
   }
