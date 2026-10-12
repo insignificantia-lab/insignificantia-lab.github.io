@@ -26,7 +26,7 @@ const HomePage = props => {
         </div>
 
         <div className='ins-home-end-actions'>
-          <a className='ins-btn primary' href='/page/1'>
+          <a className='ins-btn primary' href='/article'>
             浏览全部
           </a>
           <a className='ins-btn' href='#top'>

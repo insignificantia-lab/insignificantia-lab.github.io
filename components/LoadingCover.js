@@ -30,7 +30,7 @@ export default function LoadingCover() {
     <div
       id='loading-cover'
       onClick={handleClick}
-      className={`dark:text-white text-black bg-white dark:bg-black animate__animated animate__faster ${
+      className={`text-[#f2eee4] bg-[#202d35] animate__animated animate__faster ${
         onLoading ? 'animate__fadeIn' : 'animate__fadeOut'
       } flex flex-col justify-center z-50 w-full h-screen fixed top-0 left-0`}>
       <div className='mx-auto'>
@@ -40,8 +40,8 @@ export default function LoadingCover() {
             width: 20px;
             aspect-ratio: 1;
             border-radius: 50%;
-            background: #000;
-            box-shadow: 0 0 0 0 #0004;
+            background: #ed8eac;
+            box-shadow: 0 0 0 0 rgba(237, 142, 172, .28);
             animation: l2 1.5s infinite linear;
             position: relative;
           }
@@ -51,17 +51,12 @@ export default function LoadingCover() {
             position: absolute;
             inset: 0;
             border-radius: inherit;
-            box-shadow: 0 0 0 0 #0004;
+            box-shadow: 0 0 0 0 rgba(237, 142, 172, .28);
             animation: inherit;
             animation-delay: -0.5s;
           }
           .loader:after {
             animation-delay: -1s;
-          }
-            /* 深色模式下的样式 */
-          .dark .loader {
-            background: #fff; /* 白色或灰色 */
-            box-shadow: 0 0 0 0 #fff4; /* 使用白色阴影 */
           }
           @keyframes l2 {
             100% {

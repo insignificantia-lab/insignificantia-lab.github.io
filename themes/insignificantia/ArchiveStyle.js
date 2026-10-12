@@ -2,9 +2,9 @@ export const ArchiveStyle = () => {
   return (
     <style jsx global>{`
       .ins-archive-page {
-        max-width: var(--ins-max);
+        width: min(980px, calc(100% - 68px));
         margin: 0 auto;
-        padding: 76px 34px 120px;
+        padding: 76px 0 120px;
       }
 
       .ins-archive-header {
@@ -12,9 +12,13 @@ export const ArchiveStyle = () => {
       }
 
       .ins-archive-grid {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 24px;
+        justify-content: center;
       }
 
       .ins-archive-year-grid {
@@ -59,17 +63,21 @@ export const ArchiveStyle = () => {
       }
 
       .ins-archive-card:hover strong {
-        color: var(--ins-accent);
+        color: var(--ins-pink);
       }
 
       .ins-archive-card small {
-        color: var(--ins-faint);
+        color: var(--ins-muted-2);
         font-size: 11px;
         line-height: 1.5;
         letter-spacing: 0.11em;
       }
 
       @media (max-width: 1050px) {
+        .ins-archive-page {
+          width: min(760px, calc(100% - 68px));
+        }
+
         .ins-archive-grid {
           grid-template-columns: repeat(3, minmax(0, 1fr));
         }
@@ -77,7 +85,8 @@ export const ArchiveStyle = () => {
 
       @media (max-width: 760px) {
         .ins-archive-page {
-          padding: 54px 18px 86px;
+          width: calc(100% - 36px);
+          padding: 54px 0 86px;
         }
 
         .ins-archive-header {

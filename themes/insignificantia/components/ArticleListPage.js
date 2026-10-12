@@ -5,7 +5,9 @@ const PAGE_SIZE = 15
 
 const safeNumber = (value, fallback) => {
   const number = Number(value)
-  return Number.isFinite(number) && number > 0 ? number : fallback
+  return Number.isFinite(number) && number > 0
+    ? number
+    : fallback
 }
 
 const getHref = post => {
@@ -14,16 +16,27 @@ const getHref = post => {
   return '/'
 }
 
-const getDate = post => post?.publishDay || post?.date || ''
+const getDate = post =>
+  post?.publishDay || post?.date || ''
 
 const isArticle = post => {
   if (!post) return false
+
   const type = String(post.type || '').toLowerCase()
-  return type !== 'menu' && type !== 'submenu'
+  const excluded = new Set([
+    'menu',
+    'submenu',
+    'page',
+    'notice',
+    'config'
+  ])
+
+  return !excluded.has(type)
 }
 
 const ArticleListPage = ({
   posts,
+  archivePosts,
   postCount,
   totalPostCount,
   total,
@@ -45,9 +58,14 @@ const ArticleListPage = ({
     1
   )
 
-  const sourcePosts = Array.isArray(posts)
-    ? posts.filter(isArticle)
-    : []
+  const rawPosts =
+    Array.isArray(posts) && posts.length > 0
+      ? posts
+      : Array.isArray(archivePosts)
+        ? archivePosts
+        : []
+
+  const sourcePosts = rawPosts.filter(isArticle)
 
   const declaredPostCount = safeNumber(
     postCount ||
@@ -77,49 +95,53 @@ const ArticleListPage = ({
     if (typeof makePageHref === 'function') {
       return makePageHref(pageNumber)
     }
-    return `/page/${pageNumber}`
+
+    return pageNumber === 1
+      ? '/article'
+      : `/page/${pageNumber}`
   }
 
   return (
     <main className='ins-article-index'>
       <header className='ins-article-index-header'>
-        <div className='ins-page-kicker'>{kicker}</div>
+        <div className='ins-page-kicker'>
+          {kicker}
+        </div>
       </header>
 
       <section
         className='ins-article-index-list'
         aria-label={kicker}>
-        {visiblePosts.map((post, index) => {
-          const href = getHref(post)
+        {visiblePosts.map((post, index) => (
+          <Link
+            key={
+              post.id ||
+              post.pageId ||
+              post.slug ||
+              `${post.title}-${index}`
+            }
+            href={getHref(post)}
+            className='ins-article-list-card'
+            aria-label={`阅读：${
+              post?.title || 'Untitled'
+            }`}>
+            <div className='ins-article-list-date'>
+              {getDate(post)}
+            </div>
 
-          return (
-            <Link
-              key={
-                post.id ||
-                post.pageId ||
-                post.slug ||
-                `${post.title}-${index}`
-              }
-              href={href}
-              className='ins-article-list-card'
-              aria-label={`阅读：${post?.title || 'Untitled'}`}>
+            <h2>{post?.title || 'Untitled'}</h2>
 
-              <div className='ins-article-list-date'>
-                {getDate(post)}
-              </div>
+            {post?.summary && (
+              <p>{post.summary}</p>
+            )}
 
-              <h2>{post?.title || 'Untitled'}</h2>
-
-              {post?.summary && <p>{post.summary}</p>}
-
-              <div className='ins-article-list-actions'>
-                <span className='ins-read-more'>
-                  继续阅读
-                </span>
-              </div>
-            </Link>
-          )
-        })}
+            <div className='ins-article-list-actions'>
+              <span className='ins-read-more'>
+                继续阅读
+              </span>
+            </div>
+          </Link>
+        ))}
 
         {visiblePosts.length === 0 && (
           <div className='ins-article-list-empty'>
@@ -132,23 +154,30 @@ const ArticleListPage = ({
         <nav
           className='ins-pagination'
           aria-label='文章分页'>
-          {Array.from({ length: totalPages }, (_, index) => {
-            const pageNumber = index + 1
+          {Array.from(
+            { length: totalPages },
+            (_, index) => {
+              const pageNumber = index + 1
 
-            return (
-              <Link
-                key={pageNumber}
-                href={pageHref(pageNumber)}
-                aria-current={
-                  pageNumber === currentPage ? 'page' : undefined
-                }
-                className={`ins-page-dot ${
-                  pageNumber === currentPage ? 'is-current' : ''
-                }`}>
-                {pageNumber}
-              </Link>
-            )
-          })}
+              return (
+                <Link
+                  key={pageNumber}
+                  href={pageHref(pageNumber)}
+                  aria-current={
+                    pageNumber === currentPage
+                      ? 'page'
+                      : undefined
+                  }
+                  className={`ins-page-dot ${
+                    pageNumber === currentPage
+                      ? 'is-current'
+                      : ''
+                  }`}>
+                  {pageNumber}
+                </Link>
+              )
+            }
+          )}
         </nav>
       )}
     </main>

@@ -35,7 +35,7 @@ const extractYear = post => {
   return match ? match[0] : ''
 }
 
-const tagSort = (a, b) => {
+const categorySort = (a, b) => {
   const left = normalizeOption(a).name
   const right = normalizeOption(b).name
 
@@ -85,8 +85,8 @@ const ArchivePage = props => {
     )
   }
 
-  const tags = Array.isArray(props?.tagOptions)
-    ? [...props.tagOptions].sort(tagSort)
+  const categories = Array.isArray(props?.categoryOptions)
+    ? [...props.categoryOptions].sort(categorySort)
     : []
 
   const years = [
@@ -105,19 +105,21 @@ const ArchivePage = props => {
 
       <section
         className='ins-archive-grid'
-        aria-label='按标签浏览'>
-        {tags.map((option, index) => {
-          const tag = normalizeOption(option)
-          if (!tag.name) return null
+        aria-label='按分类浏览'>
+        {categories.map((option, index) => {
+          const category = normalizeOption(option)
+          if (!category.name) return null
 
           return (
             <Link
-              key={`${tag.name}-${index}`}
-              href={`/tag/${encodeURIComponent(tag.name)}`}
+              key={`${category.name}-${index}`}
+              href={`/category/${encodeURIComponent(
+                category.name
+              )}`}
               className='ins-archive-card'>
-              <strong>{tag.name}</strong>
-              {tag.count !== '' && (
-                <small>{tag.count} ARTICLES</small>
+              <strong>{category.name}</strong>
+              {category.count !== '' && (
+                <small>{category.count} ARTICLES</small>
               )}
             </Link>
           )

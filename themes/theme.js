@@ -11,57 +11,60 @@ const layoutByThemeCache = new Map()
 let domFixTimer = null
 
 const LayoutLoading = () => (
-  <div className='min-h-screen w-full bg-[#f6f6f1] dark:bg-black' />
+  <div
+    data-ins-loading='page'
+    className='min-h-screen w-full bg-[#202d35]'
+  />
 )
 
 const EmptyBaseLayout = ({ children }) => <>{children}</>
 const EmptyPageLayout = () => null
 
+/**
+ * Insignificantia. loading shell.
+ *
+ * IMPORTANT:
+ * This replaces only the visual placeholder used while LayoutIndex is
+ * dynamically imported. It does not change theme resolution, routing,
+ * caching, fallback, or data loading logic.
+ */
 const IndexLayoutLoading = () => (
-  <div className='pt-10 md:pt-18 w-full bg-[#f6f6f1] dark:bg-black'>
-    <div className='mx-auto w-full max-w-screen-3xl px-4 py-10 lg:px-0'>
-      <div className='grid gap-10 xl:grid-cols-2'>
-        <section className='space-y-5'>
-          <div className='h-80 w-full animate-pulse bg-gray-200 dark:bg-gray-800' />
-          <div className='h-10 w-4/5 animate-pulse bg-gray-200 dark:bg-gray-800' />
-          <div className='h-4 w-2/3 animate-pulse bg-gray-200 dark:bg-gray-800' />
-          <div className='h-4 w-24 animate-pulse bg-gray-200 dark:bg-gray-800' />
-        </section>
-        <section className='space-y-6'>
-          <div className='h-48 w-full animate-pulse bg-gray-200 dark:bg-gray-800' />
-          {[0, 1].map(item => (
-            <div
-              key={item}
-              className='flex gap-6 border-t border-gray-300 pt-6 dark:border-gray-800'>
-              <div className='min-w-0 flex-1 space-y-3'>
-                <div className='h-6 w-4/5 animate-pulse bg-gray-200 dark:bg-gray-800' />
-                <div className='h-4 w-2/3 animate-pulse bg-gray-200 dark:bg-gray-800' />
-                <div className='h-4 w-20 animate-pulse bg-gray-200 dark:bg-gray-800' />
-              </div>
-              <div className='h-32 w-32 shrink-0 animate-pulse bg-gray-200 dark:bg-gray-800' />
-            </div>
-          ))}
-        </section>
-      </div>
+  <main
+    data-ins-loading='home'
+    className='min-h-screen w-full bg-[#202d35] text-[#f2eee4]'>
+    <section className='min-h-[650px] w-full border-b border-[rgba(225,231,226,.04)] bg-[#202d35]'>
+      <div className='mx-auto grid min-h-[650px] w-full max-w-[1400px] items-center gap-[29px] px-[34px] py-[82px] xl:grid-cols-[minmax(0,1fr)_620px]'>
+        <div>
+          <div className='mb-[22px] h-3 w-44 animate-pulse rounded-sm bg-[#ed8eac]/35' />
+          <div className='h-16 w-[86%] max-w-[640px] animate-pulse rounded-md bg-[#f2eee4]/10' />
+          <div className='mt-5 h-16 w-[72%] max-w-[520px] animate-pulse rounded-md bg-[#f2eee4]/10' />
+          <div className='mt-8 h-4 w-[76%] max-w-[610px] animate-pulse rounded-sm bg-[#aeb9b9]/15' />
+          <div className='mt-3 h-4 w-[58%] max-w-[470px] animate-pulse rounded-sm bg-[#aeb9b9]/15' />
+          <div className='mt-8 flex gap-3'>
+            <div className='h-11 w-28 animate-pulse rounded-[9px] bg-[#ed8eac]/28' />
+            <div className='h-11 w-24 animate-pulse rounded-[9px] border border-[rgba(237,142,172,.28)] bg-transparent' />
+          </div>
+        </div>
 
-      <section className='mt-12'>
-        <div className='flex items-center justify-between'>
-          <div className='h-7 w-28 animate-pulse bg-gray-200 dark:bg-gray-800' />
-          <div className='h-5 w-24 animate-pulse bg-gray-200 dark:bg-gray-800' />
+        <div className='w-full'>
+          <div className='aspect-[1.17/1] w-full animate-pulse rounded-[9px] border border-[rgba(225,231,226,.10)] bg-[#2b3942]' />
         </div>
-        <div className='mt-6 grid gap-8 md:grid-cols-2 xl:grid-cols-4'>
-          {[0, 1, 2, 3].map(item => (
-            <div
-              key={item}
-              className='space-y-4 border-t border-gray-300 pt-5 dark:border-gray-800'>
-              <div className='h-5 w-3/4 animate-pulse bg-gray-200 dark:bg-gray-800' />
-              <div className='h-4 w-24 animate-pulse bg-gray-200 dark:bg-gray-800' />
-            </div>
-          ))}
+      </div>
+    </section>
+
+    <section className='mx-auto w-full max-w-[900px] px-[18px] py-[88px] md:px-0'>
+      {[0, 1, 2].map(item => (
+        <div
+          key={item}
+          className='mb-11 rounded-[9px] border border-[rgba(225,231,226,.10)] bg-[#2b3942] px-8 py-9 md:px-[54px] md:py-[46px]'>
+          <div className='h-3 w-28 animate-pulse rounded-sm bg-[#ed8eac]/30' />
+          <div className='mt-5 h-8 w-[72%] animate-pulse rounded-sm bg-[#f2eee4]/10' />
+          <div className='mt-5 h-4 w-full animate-pulse rounded-sm bg-[#aeb9b9]/13' />
+          <div className='mt-3 h-4 w-[84%] animate-pulse rounded-sm bg-[#aeb9b9]/13' />
         </div>
-      </section>
-    </div>
-  </div>
+      ))}
+    </section>
+  </main>
 )
 
 const getLayoutLoading = layoutName => {

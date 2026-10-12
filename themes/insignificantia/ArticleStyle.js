@@ -2,9 +2,9 @@ export const ArticleStyle = () => {
   return (
     <style jsx global>{`
       .ins-article-index {
-        max-width: var(--ins-max);
+        width: min(900px, calc(100% - 68px));
         margin: 0 auto;
-        padding: 76px 34px 120px;
+        padding: 76px 0 120px;
       }
 
       .ins-article-index-header {
@@ -12,7 +12,7 @@ export const ArticleStyle = () => {
       }
 
       .ins-page-kicker {
-        color: var(--ins-accent);
+        color: var(--ins-pink) !important;
         font-size: 12px;
         line-height: 1.5;
         letter-spacing: 0.15em;
@@ -50,9 +50,11 @@ export const ArticleStyle = () => {
 
       .ins-article-list-date {
         margin: 0 0 14px;
-        color: var(--ins-faint);
+        color: var(--ins-pink);
         font-size: 12px;
         line-height: 1.5;
+        font-weight: 620;
+        letter-spacing: 0.02em;
       }
 
       .ins-article-list-card h2 {
@@ -67,11 +69,11 @@ export const ArticleStyle = () => {
       }
 
       .ins-article-list-card:hover h2 {
-        color: var(--ins-accent);
+        color: var(--ins-pink);
       }
 
       .ins-article-list-card p {
-        max-width: 1000px;
+        max-width: 100%;
         margin: 0;
         color: #c8cfcd;
         font-size: 15.5px;
@@ -96,18 +98,20 @@ export const ArticleStyle = () => {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        color: var(--ins-accent);
+        color: var(--ins-pink) !important;
         font-size: 13px;
         line-height: 1;
         font-weight: 620;
         transition:
           background 160ms ease,
-          border-color 160ms ease;
+          border-color 160ms ease,
+          color 160ms ease;
       }
 
       .ins-article-list-card:hover .ins-read-more {
         background: rgba(237, 142, 172, 0.08);
         border-color: rgba(237, 142, 172, 0.72);
+        color: var(--ins-pink-hover) !important;
       }
 
       .ins-pagination {
@@ -121,7 +125,7 @@ export const ArticleStyle = () => {
       .ins-page-dot {
         width: 42px;
         height: 42px;
-        border: 1px solid rgba(225, 231, 226, 0.18);
+        border: 1px solid var(--ins-line-strong);
         border-radius: 50%;
         display: grid;
         place-items: center;
@@ -137,8 +141,8 @@ export const ArticleStyle = () => {
 
       .ins-page-dot:hover,
       .ins-page-dot.is-current {
-        background: var(--ins-accent);
-        border-color: var(--ins-accent);
+        background: var(--ins-pink);
+        border-color: var(--ins-pink);
         color: #253039 !important;
         text-decoration: none !important;
       }
@@ -151,13 +155,14 @@ export const ArticleStyle = () => {
         padding: 48px;
         border: 1px dashed var(--ins-line);
         border-radius: var(--ins-radius);
-        color: var(--ins-faint);
+        color: var(--ins-muted-2);
         text-align: center;
       }
 
       @media (max-width: 760px) {
         .ins-article-index {
-          padding: 54px 18px 86px;
+          width: calc(100% - 36px);
+          padding: 54px 0 86px;
         }
 
         .ins-article-index-header {

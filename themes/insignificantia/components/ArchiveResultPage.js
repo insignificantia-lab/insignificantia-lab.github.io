@@ -4,19 +4,21 @@ import ArticleListPage from './ArticleListPage'
 const ArchiveResultPage = props => {
   const router = useRouter()
 
-  const tag =
-    router?.query?.tag ||
+  const filterValue =
     router?.query?.category ||
+    router?.query?.tag ||
     ''
 
-  const label = Array.isArray(tag)
-    ? tag[0]
-    : decodeURIComponent(String(tag || ''))
+  const label = Array.isArray(filterValue)
+    ? filterValue[0]
+    : decodeURIComponent(String(filterValue || ''))
 
-  const base =
+  const isCategory =
     router?.pathname?.includes('/category/')
-      ? `/category/${encodeURIComponent(label)}/page`
-      : `/tag/${encodeURIComponent(label)}/page`
+
+  const base = isCategory
+    ? `/category/${encodeURIComponent(label)}/page`
+    : `/tag/${encodeURIComponent(label)}/page`
 
   return (
     <ArticleListPage

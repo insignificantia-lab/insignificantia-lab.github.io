@@ -20,6 +20,11 @@ export const Style = () => {
         --ins-shadow-soft: 0 10px 28px rgba(5, 12, 16, 0.18);
         --ins-radius: 9px;
         --ins-shell: 1400px;
+        --ins-content: 900px;
+        --ins-accent: var(--ins-pink);
+        --ins-accent-hover: var(--ins-pink-hover);
+        --ins-faint: var(--ins-muted-2);
+        --ins-max: var(--ins-shell);
         --ins-ui-font: "Avenir Next", "Segoe UI Variable Display", "SF Pro Display",
           "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
         --ins-serif: Georgia, "Songti SC", "STSong", serif;
@@ -454,6 +459,8 @@ export const Style = () => {
       }
 
       .ins-post-list {
+        width: min(var(--ins-content), 100%);
+        margin: 0 auto;
         display: grid;
         gap: 44px;
       }
@@ -539,10 +546,11 @@ export const Style = () => {
       }
 
       .ins-home-end-actions {
+        width: min(var(--ins-content), 100%);
+        margin: 58px auto 0;
         display: flex;
         justify-content: center;
         gap: 14px;
-        margin-top: 58px;
         flex-wrap: wrap;
       }
 
@@ -681,6 +689,22 @@ export const Style = () => {
         .ins-post-meta {
           gap: 10px;
         }
+      }
+
+
+      .ins-system-page {
+        width: min(900px, calc(100% - 68px));
+        min-height: 60vh;
+        margin: 0 auto;
+        padding: 96px 0 120px;
+      }
+
+      .ins-system-page h1 {
+        margin: 18px 0 0;
+        color: var(--ins-text);
+        font-family: Georgia, "Songti SC", "STSong", serif;
+        font-size: 42px;
+        line-height: 1.25;
       }
 
       @media (prefers-reduced-motion: reduce) {

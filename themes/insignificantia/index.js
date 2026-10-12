@@ -1,10 +1,9 @@
-import * as ExampleTheme from '../example'
-import { Style as ExampleStyle } from '../example/style'
 import { Style } from './style'
 import { ArticleStyle } from './ArticleStyle'
 import { ArchiveStyle } from './ArchiveStyle'
 import { ArticleDetailStyle } from './ArticleDetailStyle'
 import { AboutStyle } from './AboutStyle'
+import { IntegrationOverrides } from './IntegrationOverrides'
 import CONFIG from './config'
 import SiteHeader from './components/SiteHeader'
 import SiteFooter from './components/SiteFooter'
@@ -18,12 +17,12 @@ import AboutPage from './components/AboutPage'
 const LayoutBase = props => {
   return (
     <div id='theme-insignificantia'>
-      <ExampleStyle />
       <Style />
       <ArticleStyle />
       <ArchiveStyle />
       <ArticleDetailStyle />
       <AboutStyle />
+      <IntegrationOverrides />
       <SiteHeader />
       <div className='ins-page-shell'>{props.children}</div>
       <SiteFooter />
@@ -63,17 +62,18 @@ const LayoutSlug = props => {
   return <ArticleDetailPage {...props} />
 }
 
-// Not part of the current Insignificantia. product surface.
-// Keep stable NotionNext fallbacks until/if these routes are needed.
+const Layout404 = () => (
+  <main className='ins-system-page'>
+    <div className='ins-page-kicker'>404</div>
+    <h1>页面不存在</h1>
+  </main>
+)
+
+// Insignificantia. v1 does not expose Search / Sign-in / Sign-up pages.
 const EmptyLayout = () => <></>
-const LayoutSearch =
-  ExampleTheme.LayoutSearch || EmptyLayout
-const Layout404 =
-  ExampleTheme.Layout404 || EmptyLayout
-const LayoutSignIn =
-  ExampleTheme.LayoutSignIn || EmptyLayout
-const LayoutSignUp =
-  ExampleTheme.LayoutSignUp || EmptyLayout
+const LayoutSearch = EmptyLayout
+const LayoutSignIn = EmptyLayout
+const LayoutSignUp = EmptyLayout
 
 export {
   Layout404,

@@ -1,23 +1,17 @@
 import Link from 'next/link'
 
-const normalizeTag = tag => {
-  if (!tag) return ''
-  if (typeof tag === 'string') return tag
-  return tag.name || tag.value || tag.text || ''
+const normalizeCategory = category => {
+  if (!category) return ''
+  if (typeof category === 'string') return category
+  return category.name || category.value || category.text || ''
 }
 
-const getPrimaryTag = post => {
-  if (post?.category) {
-    if (Array.isArray(post.category)) return normalizeTag(post.category[0])
-    return normalizeTag(post.category)
+const getCategory = post => {
+  if (Array.isArray(post?.category)) {
+    return normalizeCategory(post.category[0])
   }
-  if (Array.isArray(post?.tagItems) && post.tagItems.length > 0) {
-    return normalizeTag(post.tagItems[0])
-  }
-  if (Array.isArray(post?.tags) && post.tags.length > 0) {
-    return normalizeTag(post.tags[0])
-  }
-  return 'NOTE'
+
+  return normalizeCategory(post?.category)
 }
 
 const getHref = post => {
@@ -29,6 +23,7 @@ const getHref = post => {
 const PostCard = ({ post }) => {
   const href = getHref(post)
   const title = post?.title || 'Untitled'
+  const category = getCategory(post)
 
   return (
     <Link
@@ -36,7 +31,11 @@ const PostCard = ({ post }) => {
       className='ins-post-card'
       aria-label={`阅读：${title}`}>
       <div className='ins-post-meta'>
-        <span className='ins-primary-tag'>{getPrimaryTag(post)}</span>
+        {category && (
+          <span className='ins-primary-tag'>
+            {category}
+          </span>
+        )}
         <span>{post?.publishDay || post?.date || ''}</span>
       </div>
 

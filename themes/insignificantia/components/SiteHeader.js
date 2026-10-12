@@ -13,7 +13,7 @@ const SiteHeader = () => {
         </Link>
 
         <nav className='ins-nav-links' aria-label='Primary navigation'>
-          <Link href='/page/1'>ARTICLE</Link>
+          <Link href='/article'>ARTICLE</Link>
           <Link href='/archive'>ARCHIVE</Link>
           <Link href='/about'>ABOUT</Link>
         </nav>
@@ -31,7 +31,7 @@ const SiteHeader = () => {
       <nav
         className={`ins-mobile-menu ${open ? 'open' : ''}`}
         aria-label='Mobile navigation'>
-        <Link href='/page/1' onClick={() => setOpen(false)}>
+        <Link href='/article' onClick={() => setOpen(false)}>
           ARTICLE
         </Link>
         <Link href='/archive' onClick={() => setOpen(false)}>

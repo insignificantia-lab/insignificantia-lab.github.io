@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useState } from 'react'
 import NotionPage from '@/components/NotionPage'
 
 const normalizeTag = tag => {
@@ -17,8 +18,11 @@ const getHref = post => {
 const ArticleDetailPage = ({
   post,
   prev,
-  next
+  next,
+  toc: tocProp
 }) => {
+  const [tocOpen, setTocOpen] = useState(false)
+
   if (!post) {
     return (
       <main className='ins-article-shell'>
@@ -29,9 +33,11 @@ const ArticleDetailPage = ({
     )
   }
 
-  const toc = Array.isArray(post?.toc)
-    ? post.toc
-    : []
+  const toc = Array.isArray(tocProp)
+    ? tocProp
+    : Array.isArray(post?.toc)
+      ? post.toc
+      : []
 
   const tags = Array.isArray(post?.tagItems)
     ? post.tagItems.map(normalizeTag).filter(Boolean)
@@ -53,13 +59,7 @@ const ArticleDetailPage = ({
 
       <div className='ins-article-layout'>
         <article className='ins-article-body'>
-          {post?.summary && (
-            <p className='ins-article-lead'>
-              {post.summary}
-            </p>
-          )}
-
-          <div className='ins-notion-content'>
+<div className='ins-notion-content'>
             <NotionPage post={post} />
           </div>
 
@@ -104,44 +104,67 @@ const ArticleDetailPage = ({
         </article>
 
         {toc.length > 0 && (
-          <aside
-            className='ins-toc'
-            aria-label='文章目录'>
-            <div className='ins-toc-label'>
-              CONTENTS
-            </div>
+          <aside className='ins-toc-dock'>
+            <button
+              type='button'
+              className='ins-toc-trigger'
+              aria-label='打开文章目录'
+              aria-expanded={tocOpen}
+              onClick={() =>
+                setTocOpen(value => !value)
+              }>
+              <span />
+              <span />
+              <span />
+            </button>
 
-            {toc.map((item, index) => {
-              const id =
-                item?.id ||
-                item?.blockId ||
-                item?.uuid ||
-                ''
-              const text =
-                item?.text ||
-                item?.title ||
-                item?.value ||
-                ''
-              const level =
-                item?.indentLevel ??
-                item?.level ??
-                0
+            {tocOpen && (
+              <nav
+                className='ins-toc-popover'
+                aria-label='文章目录'>
+                {toc.map((item, index) => {
+                  const id =
+                    item?.id ||
+                    item?.blockId ||
+                    item?.uuid ||
+                    ''
 
-              if (!text) return null
+                  const text =
+                    item?.text ||
+                    item?.title ||
+                    item?.value ||
+                    ''
 
-              return (
-                <a
-                  key={id || `${text}-${index}`}
-                  href={id ? `#${id}` : '#'}
-                  className={
-                    Number(level) > 0
-                      ? 'is-sub'
-                      : ''
-                  }>
-                  {text}
-                </a>
-              )
-            })}
+                  const level =
+                    item?.indentLevel ??
+                    item?.level ??
+                    0
+
+                  if (!text) return null
+
+                  return (
+                    <a
+                      key={
+                        id ||
+                        `${text}-${index}`
+                      }
+                      href={
+                        id ? `#${id}` : '#'
+                      }
+                      className={
+                        Number(level) > 0
+                          ? 'is-sub'
+                          : ''
+                      }
+                      onClick={() =>
+                        setTocOpen(false)
+                      }>
+                      {text}
+                    </a>
+                  )
+                })}
+              </nav>
+            )}
           </aside>
         )}
       </div>

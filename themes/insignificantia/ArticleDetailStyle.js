@@ -6,21 +6,20 @@ export const ArticleDetailStyle = () => {
       }
 
       .ins-article-header {
-        max-width: 1080px;
+        width: min(810px, calc(100% - 68px));
         margin: 0 auto;
-        padding: 88px 34px 42px;
+        padding: 88px 0 42px;
       }
 
       .ins-article-date {
         margin-bottom: 22px;
-        color: var(--ins-faint);
+        color: var(--ins-muted-2);
         font-size: 13px;
         line-height: 1.5;
         letter-spacing: 0.06em;
       }
 
       .ins-article-title {
-        max-width: 980px;
         margin: 0;
         color: var(--ins-text);
         font-family: Georgia, "Songti SC", "STSong", serif;
@@ -31,17 +30,14 @@ export const ArticleDetailStyle = () => {
       }
 
       .ins-article-layout {
-        max-width: 1080px;
+        width: min(810px, calc(100% - 68px));
         margin: 0 auto;
-        padding: 8px 34px 110px;
-        display: grid;
-        grid-template-columns: minmax(0, 810px) 190px;
-        gap: 70px;
-        align-items: start;
+        padding: 8px 0 110px;
+        position: relative;
       }
 
       .ins-article-body {
-        min-width: 0;
+        width: 100%;
         color: #d2d5cf;
         font-size: 17.5px;
         line-height: 2;
@@ -116,20 +112,43 @@ export const ArticleDetailStyle = () => {
       }
 
       .ins-notion-content a {
-        color: var(--ins-accent) !important;
+        color: var(--ins-pink) !important;
         font-weight: 570;
       }
 
+      /* Quote: no blue box, just a cream vertical rule and quieter text. */
       .ins-notion-content blockquote,
       .ins-notion-content .notion-quote {
         margin: 2.2em 0 !important;
-        padding: 21px 26px 21px 28px !important;
-        border-left: 3px solid var(--ins-accent) !important;
-        border-radius: 0 var(--ins-radius) var(--ins-radius) 0;
-        background: rgba(49, 70, 80, 0.48);
-        color: #dfe0da;
+        padding: 2px 0 2px 22px !important;
+        border: 0 !important;
+        border-left: 2px solid var(--ins-text) !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        color: #b8c1bd !important;
         font-size: 17px;
         line-height: 1.92;
+        font-style: normal;
+      }
+
+      .ins-notion-content blockquote *,
+      .ins-notion-content .notion-quote * {
+        color: inherit !important;
+      }
+
+      /* Callout: close to the site's main background instead of bright blue. */
+      .ins-notion-content .notion-callout {
+        margin: 2.1em 0 !important;
+        padding: 18px 20px !important;
+        border: 1px solid var(--ins-line) !important;
+        border-radius: var(--ins-radius) !important;
+        background: #26343c !important;
+        color: #d1d5cf !important;
+        box-shadow: none !important;
+      }
+
+      .ins-notion-content .notion-callout * {
+        color: inherit;
       }
 
       .ins-notion-content figure,
@@ -145,43 +164,86 @@ export const ArticleDetailStyle = () => {
       .ins-notion-content figcaption,
       .ins-notion-content .notion-asset-caption {
         margin-top: 13px !important;
-        color: var(--ins-faint) !important;
+        color: var(--ins-muted-2) !important;
         font-size: 13px !important;
         line-height: 1.68 !important;
         text-align: center;
         letter-spacing: 0.02em;
       }
 
-      .ins-toc {
-        position: sticky;
-        top: 110px;
-        padding-left: 22px;
-        border-left: 1px solid var(--ins-line);
+      /* Compact TOC: article stays centered; closed state is only 42px wide. */
+      .ins-toc-dock {
+        position: absolute;
+        top: 8px;
+        left: calc(100% + 22px);
+        width: 42px;
+        z-index: 20;
       }
 
-      .ins-toc-label {
-        margin-bottom: 14px;
-        color: var(--ins-faint);
-        font-size: 12px;
-        line-height: 1.5;
-        letter-spacing: 0.12em;
+      .ins-toc-trigger {
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        border: 1px solid var(--ins-line-strong);
+        border-radius: var(--ins-radius);
+        background: rgba(32, 45, 53, 0.88);
+        color: var(--ins-muted);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        cursor: pointer;
+        transition:
+          color 160ms ease,
+          border-color 160ms ease,
+          background 160ms ease;
       }
 
-      .ins-toc a {
+      .ins-toc-trigger span {
+        width: 16px;
+        height: 1.5px;
+        background: currentColor;
+        border-radius: 999px;
+      }
+
+      .ins-toc-trigger:hover,
+      .ins-toc-trigger[aria-expanded="true"] {
+        color: var(--ins-pink);
+        border-color: rgba(237, 142, 172, 0.62);
+        background: rgba(43, 57, 66, 0.96);
+      }
+
+      .ins-toc-popover {
+        position: absolute;
+        right: 52px;
+        top: 0;
+        width: 260px;
+        max-height: min(68vh, 560px);
+        overflow-y: auto;
+        padding: 14px 16px;
+        border: 1px solid var(--ins-line);
+        border-radius: var(--ins-radius);
+        background: rgba(27, 39, 46, 0.98);
+        box-shadow: var(--ins-shadow-soft);
+        backdrop-filter: blur(10px);
+      }
+
+      .ins-toc-popover a {
         display: block;
-        padding: 7px 0;
+        padding: 7px 4px;
         color: var(--ins-muted) !important;
         font-size: 13px;
         line-height: 1.55;
       }
 
-      .ins-toc a.is-sub {
-        padding-left: 14px;
+      .ins-toc-popover a.is-sub {
+        padding-left: 16px;
         font-size: 12.5px;
       }
 
-      .ins-toc a:hover {
-        color: var(--ins-accent) !important;
+      .ins-toc-popover a:hover {
+        color: var(--ins-pink) !important;
         text-decoration: none !important;
       }
 
@@ -202,7 +264,7 @@ export const ArticleDetailStyle = () => {
         padding: 5px 11px;
         border: 1px solid rgba(237, 142, 172, 0.36);
         border-radius: 999px;
-        color: var(--ins-accent) !important;
+        color: var(--ins-pink) !important;
         font-size: 12px;
         line-height: 1.5;
       }
@@ -243,26 +305,22 @@ export const ArticleDetailStyle = () => {
       }
 
       .ins-article-loading {
-        max-width: 1080px;
+        width: min(810px, calc(100% - 68px));
         margin: 0 auto;
-        padding: 100px 34px;
-        color: var(--ins-faint);
+        padding: 100px 0;
+        color: var(--ins-muted-2);
       }
 
-      @media (max-width: 1000px) {
-        .ins-article-layout {
-          grid-template-columns: 1fr;
-          gap: 0;
-        }
-
-        .ins-toc {
+      @media (max-width: 980px) {
+        .ins-toc-dock {
           display: none;
         }
       }
 
       @media (max-width: 760px) {
         .ins-article-header {
-          padding: 56px 20px 36px;
+          width: calc(100% - 40px);
+          padding: 56px 0 36px;
         }
 
         .ins-article-title {
@@ -270,7 +328,8 @@ export const ArticleDetailStyle = () => {
         }
 
         .ins-article-layout {
-          padding: 6px 20px 82px;
+          width: calc(100% - 40px);
+          padding: 6px 0 82px;
         }
 
         .ins-article-body,

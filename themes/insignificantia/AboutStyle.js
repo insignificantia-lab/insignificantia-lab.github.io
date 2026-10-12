@@ -2,7 +2,7 @@ export const AboutStyle = () => {
   return (
     <style jsx global>{`
       .ins-about-page {
-        max-width: var(--ins-max);
+        max-width: var(--ins-shell);
         margin: 0 auto;
         padding: 76px 34px 120px;
       }
@@ -37,7 +37,7 @@ export const AboutStyle = () => {
 
       .ins-social-link:hover {
         transform: translateY(-2px);
-        color: var(--ins-accent) !important;
+        color: var(--ins-pink) !important;
         border-color: rgba(237, 142, 172, 0.6);
         text-decoration: none !important;
       }
@@ -196,7 +196,7 @@ export const AboutStyle = () => {
       }
 
       .ins-lightbox-close:hover {
-        color: var(--ins-accent);
+        color: var(--ins-pink);
         border-color: rgba(237, 142, 172, 0.55);
       }
 
