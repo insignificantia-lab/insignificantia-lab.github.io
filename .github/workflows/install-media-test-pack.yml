@@ -1,0 +1,64 @@
+name: Install HQ media test pack
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Insignificantia-media-test-HQ.zip'
+
+permissions:
+  contents: write
+
+jobs:
+  install-media:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Skip if pack was already consumed
+        id: pack
+        shell: bash
+        run: |
+          if [[ -f Insignificantia-media-test-HQ.zip ]]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "Media pack is no longer present; nothing to do."
+          fi
+
+      - name: Extract HQ test media
+        if: steps.pack.outputs.present == 'true'
+        shell: bash
+        run: |
+          unzip -o Insignificantia-media-test-HQ.zip -d .
+
+      - name: Verify exact test payload
+        if: steps.pack.outputs.present == 'true'
+        shell: bash
+        run: |
+          test "$(stat -c %s public/images/insignificantia/hero/hero-01.webp)" -eq 280476
+          test "$(stat -c %s public/images/insignificantia/hero/hero-02.webp)" -eq 51892
+          test "$(stat -c %s public/images/insignificantia/hero/hero-03.webp)" -eq 114464
+          test "$(stat -c %s public/images/insignificantia/portfolio/work-01.webp)" -eq 75156
+          test "$(stat -c %s public/images/insignificantia/portfolio/work-02.webp)" -eq 316428
+          test "$(stat -c %s public/images/insignificantia/portfolio/work-03.webp)" -eq 139884
+
+      - name: Commit installed media and consume pack
+        if: steps.pack.outputs.present == 'true'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/images/insignificantia/hero/hero-01.webp
+          git add public/images/insignificantia/hero/hero-02.webp
+          git add public/images/insignificantia/hero/hero-03.webp
+          git add public/images/insignificantia/portfolio/work-01.webp
+          git add public/images/insignificantia/portfolio/work-02.webp
+          git add public/images/insignificantia/portfolio/work-03.webp
+          git rm Insignificantia-media-test-HQ.zip
+          git commit -m "Visual test: install high-quality media assets"
+          git push
