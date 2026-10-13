@@ -1,11 +1,6 @@
 name: Prepare personal-site migration package
 'on':
   workflow_dispatch: null
-  push:
-    branches:
-    - fix/phase1-static-seo
-    paths:
-    - .github/workflows/prepare-personal-site-migration.yml
 permissions:
   contents: read
 concurrency:
