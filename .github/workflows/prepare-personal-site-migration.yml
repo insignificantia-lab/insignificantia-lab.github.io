@@ -1,0 +1,122 @@
+name: Prepare personal-site migration package
+'on':
+  workflow_dispatch: null
+permissions:
+  contents: read
+concurrency:
+  group: prepare-personal-site-migration
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.repository == 'insignificantia-lab/insignificantia-lab.github.io'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
+      NEXT_PUBLIC_THEME: insignificantia
+      NEXT_PUBLIC_THEME_SWITCH: 'false'
+      NEXT_PUBLIC_WIDGET_PET: 'false'
+      NEXT_PUBLIC_WIDGET_PET_SWITCH_THEME: 'false'
+      NEXT_PUBLIC_POSTS_PER_PAGE: '15'
+      NEXT_PUBLIC_LINK: https://takedaiori.github.io
+      BUILD_PREFETCH_ENABLED: 'false'
+      STATIC_PAGE_GENERATION_TIMEOUT: '600'
+    steps:
+    - name: Read fixed stable source
+      uses: actions/checkout@v4
+      with:
+        ref: 9fc3c4d9ebd1c5f37ffe7ca3e4bcfc3311f32421
+        persist-credentials: false
+    - name: Check source and required secret
+      run: "test \"$(git rev-parse HEAD)\" = \"9fc3c4d9ebd1c5f37ffe7ca3e4bcfc3311f32421\"\nif [ -z \"$NOTION_PAGE_ID\" ];\
+        \ then\n  echo 'Missing Published database secret; stop before using the default demo database.'\n  exit 1\nfi\necho\
+        \ \"MIGRATION_ROOT=$RUNNER_TEMP/insignificantia-personal-migration\" >> \"$GITHUB_ENV\"\nmkdir -p \"$RUNNER_TEMP/insignificantia-personal-migration\"\
+        \ngit archive HEAD | tar -x -C \"$RUNNER_TEMP/insignificantia-personal-migration\""
+    - name: Prepare host fixes in temporary package
+      run: "python - <<'PY'\nfrom pathlib import Path\nimport json\nimport os\np = Path(os.environ['MIGRATION_ROOT'])\nconfig\
+        \ = p / 'lib/config.js'\ns = config.read_text()\nanchor = \"  const getValue = (value, fallback) => (hasVal(value)\
+        \ ? value : fallback)\"\nguard = \"  // A migration build must consistently use its deployment host.\\n  // Notion\
+        \ Config may retain the old site's LINK.\\n  if (key === 'LINK' && process.env.NEXT_PUBLIC_LINK?.trim()) {\\n    return\
+        \ process.env.NEXT_PUBLIC_LINK.trim()\\n  }\\n\\n\"\nif s.count(anchor) != 1:\n    raise SystemExit('Unexpected lib/config.js;\
+        \ stop rather than patch a different version')\nconfig.write_text(s.replace(anchor, guard + anchor, 1))\ndeploy =\
+        \ p / '.github/workflows/deploy-pages.yml'\ns = deploy.read_text()\nold = 'NEXT_PUBLIC_LINK: https://' + chr(36) +\
+        \ '{{ github.repository_owner }}.github.io'\nif s.count(old) != 1:\n    raise SystemExit('Unexpected deployment LINK\
+        \ configuration')\ns = s.replace(old, 'NEXT_PUBLIC_LINK: https://takedaiori.github.io', 1)\nold = '      - name: Export\
+        \ static site\\n        run: yarn export'\nnew = '      - name: Validate published data source\\n        run: |\\\
+        n          if [ -z \"$NOTION_PAGE_ID\" ]; then\\n            echo \"Missing NOTION_PAGE_ID repository secret. Stop;\
+        \ do not use the upstream demo database.\"\\n            exit 1\\n          fi\\n\\n' + old\nif s.count(old) != 1:\n\
+        \    raise SystemExit('Unexpected export step')\ns = s.replace(old, new, 1)\ndeploy.write_text(s)\nmanifest = {'source_repository':\
+        \ 'insignificantia-lab/insignificantia-lab.github.io', 'source_commit': '9fc3c4d9ebd1c5f37ffe7ca3e4bcfc3311f32421',\
+        \ 'production_repository': 'takedaiori/takedaiori.github.io', 'production_url': 'https://takedaiori.github.io', 'changes':\
+        \ ['Deployment URL takes precedence over Notion LINK', 'Explicit production URL in deployment workflow', 'Fail before\
+        \ export if Published database secret is absent']}\n(p / 'MIGRATION-BASELINE.json').write_text(json.dumps(manifest,\
+        \ ensure_ascii=False, indent=2))\nprint('Migration patches applied to the temporary package only.')\nPY"
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: Install Yarn
+      run: npm install -g yarn@1.22.22
+    - name: Install dependencies
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: yarn install --frozen-lockfile
+    - name: Check code
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: yarn lint && yarn type-check
+    - name: Export for personal root site
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: yarn export
+    - name: Verify personal-site output
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: "python - <<'PY'\nfrom pathlib import Path\nfrom html.parser import HTMLParser\nfrom urllib.parse import urlparse,\
+        \ unquote\nimport json\nroot = Path('out')\nexpected = 'takedaiori.github.io'\nerrors = []\ndef exists_route(name):\n\
+        \    return (root / (name + '.html')).is_file() or (root / name / 'index.html').is_file()\nfor route in ['index',\
+        \ 'page/1', 'archive', 'about', '404']:\n    if not exists_route(route):\n        errors.append('Missing required\
+        \ route: ' + route)\nfor asset in ['sitemap.xml', 'rss/feed.xml']:\n    if not (root / asset).is_file():\n       \
+        \ errors.append('Missing required feed/sitemap: ' + asset)\nclass Inspect(HTMLParser):\n    def __init__(self, filename):\n\
+        \        super().__init__(); self.filename = filename; self.canonicals = []\n    def handle_starttag(self, tag, attributes):\n\
+        \        a = dict(attributes)\n        if tag == 'link' and a.get('rel') == 'canonical':\n            value = a.get('href',\
+        \ '')\n            self.canonicals.append(value)\n            if urlparse(value).netloc != expected:\n           \
+        \     errors.append(str(self.filename) + ': canonical does not use personal host')\n        if tag == 'meta' and a.get('property')\
+        \ == 'og:url':\n            if urlparse(a.get('content', '')).netloc != expected:\n                errors.append(str(self.filename)\
+        \ + ': Open Graph URL does not use personal host')\n        if tag in ['script', 'img', 'source', 'link']:\n     \
+        \       value = a.get('src') or a.get('href') or ''\n            if urlparse(value).netloc == 'insignificantia-lab.github.io':\n\
+        \                errors.append(str(self.filename) + ': runtime asset depends on the organization site')\n        if\
+        \ tag == 'meta' and a.get('http-equiv', '').lower() == 'refresh':\n            if 'insignificantia-lab.github.io'\
+        \ in a.get('content', ''):\n                errors.append(str(self.filename) + ': redirects to the organization site')\n\
+        html_files = list(root.rglob('*.html'))\nfor filename in html_files:\n    parser = Inspect(filename.relative_to(root))\n\
+        \    parser.feed(filename.read_text(errors='replace'))\n    if not parser.canonicals:\n        errors.append(str(filename.relative_to(root))\
+        \ + ': no canonical metadata')\nfor filename in list(root.glob('sitemap*.xml')) + [root / 'rss/feed.xml']:\n    if\
+        \ filename.is_file():\n        text = filename.read_text()\n        if 'insignificantia-lab.github.io' in text or\
+        \ 'tangly1024.com' in text:\n            errors.append(str(filename) + ': old host remains in feed/sitemap')\n   \
+        \     if expected not in text:\n            errors.append(str(filename) + ': personal host absent from feed/sitemap')\n\
+        report = {'production_url': 'https://takedaiori.github.io', 'html_pages_checked': len(html_files), 'checks': ['Required\
+        \ routes', 'RSS and sitemap host', 'Canonical and Open Graph host', 'No organization-host runtime assets or meta refresh'],\
+        \ 'errors': errors, 'result': 'PASS' if not errors else 'FAIL'}\nPath('../migration-preflight-report.json').write_text(json.dumps(report,\
+        \ ensure_ascii=False, indent=2))\nprint(json.dumps(report, ensure_ascii=False, indent=2))\nif errors:\n    raise SystemExit(1)\n\
+        PY"
+    - name: Package tracked source with migration fixes
+      run: "python - <<'PY'\nimport os\nimport subprocess\nimport zipfile\nfrom pathlib import Path\nroot = Path(os.environ['MIGRATION_ROOT'])\n\
+        paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')\npaths = [p for p in paths if p] +\
+        \ ['MIGRATION-BASELINE.json']\nwith zipfile.ZipFile(Path(os.environ['RUNNER_TEMP']) / 'Insignificantia-personal-site-source.zip',\
+        \ 'w', zipfile.ZIP_DEFLATED) as z:\n    for name in paths:\n        if name in ['.env', '.env.local', '.env.production',\
+        \ '.env.development']:\n            raise SystemExit('Do not package a real environment credential file')\n      \
+        \  p = root / name\n        if p.is_file():\n            z.write(p, name)\nprint('Packaged source only, without dependencies,\
+        \ build output, or repository credentials.')\nPY"
+    - name: Upload migration package
+      uses: actions/upload-artifact@v4
+      with:
+        name: personal-site-migration-source
+        path: ${{ runner.temp }}/Insignificantia-personal-site-source.zip
+        retention-days: 14
+    - name: Upload verification report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: personal-site-migration-verification
+        path: ${{ runner.temp }}/migration-preflight-report.json
+        if-no-files-found: warn
+        retention-days: 14
+    - name: Next step
+      run: echo 'Package prepared. This workflow does not commit, push, or deploy either site. Import the verified package
+        into the personal repository after its backup branch is confirmed.' >> "$GITHUB_STEP_SUMMARY"
