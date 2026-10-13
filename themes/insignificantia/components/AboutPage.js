@@ -49,13 +49,19 @@ const SOCIALS = [
   }
 ]
 
+const PORTFOLIO_IMAGES = [
+  '/images/insignificantia/portfolio/work-01.webp',
+  '/images/insignificantia/portfolio/work-02.webp',
+  '/images/insignificantia/portfolio/work-03.webp'
+]
+
 const PORTFOLIO = Array.from(
   { length: 12 },
   (_, index) => ({
     id: index + 1,
     title: `作品 ${String(index + 1).padStart(2, '0')}`,
     description: '这里预留一段简短的作品介绍文字。',
-    src: ''
+    src: PORTFOLIO_IMAGES[index] || ''
   })
 )
 
