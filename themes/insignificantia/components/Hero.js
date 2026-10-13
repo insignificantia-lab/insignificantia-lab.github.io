@@ -33,7 +33,7 @@ const Hero = () => {
     if (previous === null) return undefined
     const timer = window.setTimeout(() => {
       setPrevious(null)
-    }, 650)
+    }, 780)
     return () => window.clearTimeout(timer)
   }, [current, previous])
 
