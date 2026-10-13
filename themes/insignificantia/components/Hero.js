@@ -3,9 +3,21 @@ import { useEffect, useState } from 'react'
 import CONFIG from '../config'
 
 const SLIDES = [
-  { label: 'DESIGN / 01', className: 'ins-slide-one' },
-  { label: 'DESIGN / 02', className: 'ins-slide-two' },
-  { label: 'DESIGN / 03', className: 'ins-slide-three' }
+  {
+    label: 'DESIGN / 01',
+    className: 'ins-slide-one',
+    src: '/images/insignificantia/hero/hero-01.webp'
+  },
+  {
+    label: 'DESIGN / 02',
+    className: 'ins-slide-two',
+    src: '/images/insignificantia/hero/hero-02.webp'
+  },
+  {
+    label: 'DESIGN / 03',
+    className: 'ins-slide-three',
+    src: '/images/insignificantia/hero/hero-03.webp'
+  }
 ]
 
 const Hero = () => {
@@ -68,6 +80,17 @@ const Hero = () => {
                     className={`ins-slide ${slide.className} ${
                       isActive ? 'active' : ''
                     } ${isLeaving ? 'is-leaving' : ''}`}>
+                    <img
+                      src={slide.src}
+                      alt={`Hero visual ${index + 1}`}
+                      decoding='async'
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'block',
+                        objectFit: 'cover'
+                      }}
+                    />
                     <span className='ins-slide-label'>{slide.label}</span>
                   </div>
                 )
