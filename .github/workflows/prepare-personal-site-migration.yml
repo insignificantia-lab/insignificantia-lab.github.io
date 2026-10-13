@@ -25,10 +25,10 @@ jobs:
     - name: Read fixed stable source
       uses: actions/checkout@v4
       with:
-        ref: 9fc3c4d9ebd1c5f37ffe7ca3e4bcfc3311f32421
+        ref: 40a77bbb800d5959c58bd6d83192e33bdace0bc8
         persist-credentials: false
     - name: Check source and required secret
-      run: "test \"$(git rev-parse HEAD)\" = \"9fc3c4d9ebd1c5f37ffe7ca3e4bcfc3311f32421\"\nif [ -z \"$NOTION_PAGE_ID\" ];\
+      run: "test \"$(git rev-parse HEAD)\" = \"40a77bbb800d5959c58bd6d83192e33bdace0bc8\"\nif [ -z \"$NOTION_PAGE_ID\" ];\
         \ then\n  echo 'Missing Published database secret; stop before using the default demo database.'\n  exit 1\nfi\necho\
         \ \"MIGRATION_ROOT=$RUNNER_TEMP/insignificantia-personal-migration\" >> \"$GITHUB_ENV\"\nmkdir -p \"$RUNNER_TEMP/insignificantia-personal-migration\"\
         \ngit archive HEAD | tar -x -C \"$RUNNER_TEMP/insignificantia-personal-migration\""
@@ -54,7 +54,7 @@ jobs:
         \ RSS API imports')\ns = s.replace(old, old + \"\\nimport { siteConfig } from '@/lib/config'\", 1)\nold = '  const\
         \ LINK = siteInfo?.link || BLOG.LINK'\nif s.count(old) != 1:\n    raise SystemExit('Unexpected RSS API LINK configuration')\n\
         s = s.replace(old, new, 1)\nrss_api.write_text(s)\nmanifest = {'version': 2, 'source_repository': 'insignificantia-lab/insignificantia-lab.github.io',\
-        \ 'source_commit': '9fc3c4d9ebd1c5f37ffe7ca3e4bcfc3311f32421', 'production_repository': 'takedaiori/takedaiori.github.io',\
+        \ 'source_commit': '40a77bbb800d5959c58bd6d83192e33bdace0bc8', 'production_repository': 'takedaiori/takedaiori.github.io',\
         \ 'production_url': 'https://takedaiori.github.io', 'changes': ['Deployment URL takes precedence over Notion LINK',\
         \ 'Static and API RSS use the same deployment URL', 'RSS uses an empty subpath when none is configured', 'Explicit\
         \ production URL in deployment workflow', 'Fail before export if Published database secret is absent']}\n(p / 'MIGRATION-BASELINE.json').write_text(json.dumps(manifest,\
@@ -68,9 +68,19 @@ jobs:
     - name: Install dependencies
       working-directory: ${{ env.MIGRATION_ROOT }}
       run: yarn install --frozen-lockfile
+    - name: Confirm the metadata regression
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: "cp pages/_app.js \"$RUNNER_TEMP/phase1-fixed-app.js\"\ntrap 'cp \"$RUNNER_TEMP/phase1-fixed-app.js\" pages/_app.js'\
+        \ EXIT\npython - <<'PY'\nfrom pathlib import Path\np = Path('pages/_app.js')\nfixed = \"        {/* Metadata must\
+        \ render even while the dynamic theme layout is loading. */}\\n        <SEO {...pageProps} />\\n        <GLayout {...pageProps}>\"\
+        \noriginal = \"        <GLayout {...pageProps}>\\n          <SEO {...pageProps} />\"\ns = p.read_text()\nif s.count(fixed)\
+        \ != 1:\n    raise SystemExit('Unexpected SEO placement')\np.write_text(s.replace(fixed, original, 1))\nPY\nif yarn\
+        \ test --runInBand __tests__/pages/app-seo.test.js > \"$RUNNER_TEMP/phase1-before.log\" 2>&1; then\n  echo 'Regression\
+        \ test unexpectedly passed before the fix.'\n  exit 1\nfi\ncat \"$RUNNER_TEMP/phase1-before.log\"\ncp \"$RUNNER_TEMP/phase1-fixed-app.js\"\
+        \ pages/_app.js\nyarn test --runInBand __tests__/pages/app-seo.test.js\n"
     - name: Check code
       working-directory: ${{ env.MIGRATION_ROOT }}
-      run: yarn lint && yarn type-check
+      run: yarn lint && yarn type-check && yarn test --runInBand __tests__/pages/app-seo.test.js __tests__/components/SEO.test.js
     - name: Export for personal root site
       working-directory: ${{ env.MIGRATION_ROOT }}
       run: yarn export
@@ -134,12 +144,15 @@ jobs:
         \        personal_url(feed.get('home_page_url'), 'JSON feed homepage')\n        if feed.get('feed_url'):\n       \
         \     personal_url(feed['feed_url'], 'JSON feed URL')\n        for item in feed.get('items', []):\n            personal_url(item.get('url'),\
         \ 'JSON feed article URL')\n    except (ValueError, AttributeError):\n        errors.append('Malformed JSON feed')\n\
-        \nreport = {\n    'version': 3,\n    'production_url': 'https://takedaiori.github.io',\n    'html_pages_checked':\
-        \ len(html_files),\n    'canonical_exemptions': exemptions,\n    'checks': ['Required routes', 'RSS/Atom/JSON feed\
-        \ and sitemap owned URLs', 'Canonical and Open Graph host', 'No organization-host runtime assets or meta refresh'],\n\
-        \    'errors': errors,\n    'result': 'PASS' if not errors else 'FAIL',\n}\nPath('../migration-preflight-report.json').write_text(json.dumps(report,\
-        \ ensure_ascii=False, indent=2))\nprint(json.dumps(report, ensure_ascii=False, indent=2))\nif errors:\n    raise SystemExit(1)\n\
-        PY"
+        \nreport = {\n    'version': 4,\n    'production_url': 'https://takedaiori.github.io',\n    'html_pages_checked':\
+        \ len(html_files),\n    'article_pages_checked': sum(1 for f in html_files if f.relative_to(root).as_posix().startswith('article/')),\n\
+        \    'category_pages_checked': sum(1 for f in html_files if f.relative_to(root).as_posix().startswith('category/')),\n\
+        \    'tag_pages_checked': sum(1 for f in html_files if f.relative_to(root).as_posix().startswith('tag/')),\n    'coverage_note':\
+        \ 'An empty Published Post library does not validate article/category/tag routes for launch.',\n    'canonical_exemptions':\
+        \ exemptions,\n    'checks': ['Required routes', 'RSS/Atom/JSON feed and sitemap owned URLs', 'Canonical and Open\
+        \ Graph host', 'No organization-host runtime assets or meta refresh'],\n    'errors': errors,\n    'result': 'PASS'\
+        \ if not errors else 'FAIL',\n}\nPath('../migration-preflight-report.json').write_text(json.dumps(report, ensure_ascii=False,\
+        \ indent=2))\nprint(json.dumps(report, ensure_ascii=False, indent=2))\nif errors:\n    raise SystemExit(1)\nPY"
     - name: Upload verification report
       if: always()
       uses: actions/upload-artifact@v4
