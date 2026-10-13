@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Style } from './style'
 import { ArticleStyle } from './ArticleStyle'
@@ -17,52 +16,26 @@ import ArchiveResultPage from './components/ArchiveResultPage'
 import ArticleDetailPage from './components/ArticleDetailPage'
 import AboutPage from './components/AboutPage'
 
-const PageTransition = ({ children, disabled = false }) => {
+/**
+ * Visible entrance motion for all Insignificantia pages except article detail.
+ *
+ * The route path is used as the React key so client-side navigation mounts a
+ * fresh wrapper and replays the CSS keyframe. The header deliberately stays
+ * outside this wrapper and therefore never participates in page entrance
+ * motion.
+ */
+const PageEntrance = ({ children, disabled = false }) => {
   const router = useRouter()
-  const [phase, setPhase] = useState('is-entering')
-
-  useEffect(() => {
-    if (disabled) {
-      setPhase('is-entered')
-      return undefined
-    }
-
-    let frameA
-    let frameB
-
-    const enter = () => {
-      setPhase('is-entering')
-      frameA = window.requestAnimationFrame(() => {
-        frameB = window.requestAnimationFrame(() => {
-          setPhase('is-entered')
-        })
-      })
-    }
-
-    const leave = () => {
-      setPhase('is-leaving')
-    }
-
-    enter()
-    router.events.on('routeChangeStart', leave)
-    router.events.on('routeChangeComplete', enter)
-    router.events.on('routeChangeError', enter)
-
-    return () => {
-      router.events.off('routeChangeStart', leave)
-      router.events.off('routeChangeComplete', enter)
-      router.events.off('routeChangeError', enter)
-      if (frameA) window.cancelAnimationFrame(frameA)
-      if (frameB) window.cancelAnimationFrame(frameB)
-    }
-  }, [disabled, router.events])
 
   if (disabled) {
     return <>{children}</>
   }
 
   return (
-    <div className={`ins-page-transition ${phase}`}>
+    <div
+      key={router.asPath || router.pathname}
+      className='ins-page-enter'
+      data-motion='page-rise-in'>
       {children}
     </div>
   )
@@ -83,12 +56,10 @@ const LayoutBase = props => {
       <IntegrationOverrides />
       <MotionStyle />
       <SiteHeader />
-      <div className='ins-page-shell'>
-        <PageTransition disabled={isArticleDetail}>
-          {props.children}
-        </PageTransition>
-      </div>
-      <SiteFooter />
+      <PageEntrance disabled={isArticleDetail}>
+        <div className='ins-page-shell'>{props.children}</div>
+        <SiteFooter />
+      </PageEntrance>
     </div>
   )
 }
