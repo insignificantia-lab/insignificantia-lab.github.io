@@ -45,11 +45,19 @@ jobs:
         \ static site\\n        run: yarn export'\nnew = '      - name: Validate published data source\\n        run: |\\\
         n          if [ -z \"$NOTION_PAGE_ID\" ]; then\\n            echo \"Missing NOTION_PAGE_ID repository secret. Stop;\
         \ do not use the upstream demo database.\"\\n            exit 1\\n          fi\\n\\n' + old\nif s.count(old) != 1:\n\
-        \    raise SystemExit('Unexpected export step')\ns = s.replace(old, new, 1)\ndeploy.write_text(s)\nmanifest = {'source_repository':\
-        \ 'insignificantia-lab/insignificantia-lab.github.io', 'source_commit': '9fc3c4d9ebd1c5f37ffe7ca3e4bcfc3311f32421',\
-        \ 'production_repository': 'takedaiori/takedaiori.github.io', 'production_url': 'https://takedaiori.github.io', 'changes':\
-        \ ['Deployment URL takes precedence over Notion LINK', 'Explicit production URL in deployment workflow', 'Fail before\
-        \ export if Published database secret is absent']}\n(p / 'MIGRATION-BASELINE.json').write_text(json.dumps(manifest,\
+        \    raise SystemExit('Unexpected export step')\ns = s.replace(old, new, 1)\ndeploy.write_text(s)\nrss = p / 'lib/utils/rss.js'\n\
+        s = rss.read_text()\nold = '  const LINK = siteInfo?.link'\nnew = \"  const LINK = siteConfig('LINK', siteInfo?.link,\
+        \ NOTION_CONFIG)\"\nif s.count(old) != 1:\n    raise SystemExit('Unexpected static RSS LINK configuration')\ns = s.replace(old,\
+        \ new, 1)\nold = '  const SUB_PATH = NOTION_CONFIG?.SUB_PATH || BLOG.SUB_PATH'\nif s.count(old) != 1:\n    raise SystemExit('Unexpected\
+        \ static RSS SUB_PATH configuration')\ns = s.replace(old, old + \" || ''\", 1)\nrss.write_text(s)\nrss_api = p / 'pages/api/rss.js'\n\
+        s = rss_api.read_text()\nold = \"import BLOG from '@/blog.config'\"\nif s.count(old) != 1:\n    raise SystemExit('Unexpected\
+        \ RSS API imports')\ns = s.replace(old, old + \"\\nimport { siteConfig } from '@/lib/config'\", 1)\nold = '  const\
+        \ LINK = siteInfo?.link || BLOG.LINK'\nif s.count(old) != 1:\n    raise SystemExit('Unexpected RSS API LINK configuration')\n\
+        s = s.replace(old, new, 1)\nrss_api.write_text(s)\nmanifest = {'version': 2, 'source_repository': 'insignificantia-lab/insignificantia-lab.github.io',\
+        \ 'source_commit': '9fc3c4d9ebd1c5f37ffe7ca3e4bcfc3311f32421', 'production_repository': 'takedaiori/takedaiori.github.io',\
+        \ 'production_url': 'https://takedaiori.github.io', 'changes': ['Deployment URL takes precedence over Notion LINK',\
+        \ 'Static and API RSS use the same deployment URL', 'RSS uses an empty subpath when none is configured', 'Explicit\
+        \ production URL in deployment workflow', 'Fail before export if Published database secret is absent']}\n(p / 'MIGRATION-BASELINE.json').write_text(json.dumps(manifest,\
         \ ensure_ascii=False, indent=2))\nprint('Migration patches applied to the temporary package only.')\nPY"
     - name: Setup Node
       uses: actions/setup-node@v4
@@ -68,33 +76,54 @@ jobs:
       run: yarn export
     - name: Verify personal-site output
       working-directory: ${{ env.MIGRATION_ROOT }}
-      run: "python - <<'PY'\nfrom pathlib import Path\nfrom html.parser import HTMLParser\nfrom urllib.parse import urlparse,\
-        \ unquote\nimport json\nroot = Path('out')\nexpected = 'takedaiori.github.io'\nerrors = []\ndef exists_route(name):\n\
-        \    return (root / (name + '.html')).is_file() or (root / name / 'index.html').is_file()\nfor route in ['index',\
-        \ 'page/1', 'archive', 'about', '404']:\n    if not exists_route(route):\n        errors.append('Missing required\
-        \ route: ' + route)\nfor asset in ['sitemap.xml', 'rss/feed.xml']:\n    if not (root / asset).is_file():\n       \
-        \ errors.append('Missing required feed/sitemap: ' + asset)\nclass Inspect(HTMLParser):\n    def __init__(self, filename):\n\
-        \        super().__init__(); self.filename = filename; self.canonicals = []\n    def handle_starttag(self, tag, attributes):\n\
-        \        a = dict(attributes)\n        if tag == 'link' and a.get('rel') == 'canonical':\n            value = a.get('href',\
-        \ '')\n            self.canonicals.append(value)\n            if urlparse(value).netloc != expected:\n           \
-        \     errors.append(str(self.filename) + ': canonical does not use personal host')\n        if tag == 'meta' and a.get('property')\
-        \ == 'og:url':\n            if urlparse(a.get('content', '')).netloc != expected:\n                errors.append(str(self.filename)\
-        \ + ': Open Graph URL does not use personal host')\n        if tag in ['script', 'img', 'source', 'link']:\n     \
-        \       value = a.get('src') or a.get('href') or ''\n            if urlparse(value).netloc == 'insignificantia-lab.github.io':\n\
-        \                errors.append(str(self.filename) + ': runtime asset depends on the organization site')\n        if\
-        \ tag == 'meta' and a.get('http-equiv', '').lower() == 'refresh':\n            if 'insignificantia-lab.github.io'\
-        \ in a.get('content', ''):\n                errors.append(str(self.filename) + ': redirects to the organization site')\n\
-        html_files = list(root.rglob('*.html'))\nfor filename in html_files:\n    parser = Inspect(filename.relative_to(root))\n\
-        \    parser.feed(filename.read_text(errors='replace'))\n    if not parser.canonicals:\n        errors.append(str(filename.relative_to(root))\
-        \ + ': no canonical metadata')\nfor filename in list(root.glob('sitemap*.xml')) + [root / 'rss/feed.xml']:\n    if\
-        \ filename.is_file():\n        text = filename.read_text()\n        if 'insignificantia-lab.github.io' in text or\
-        \ 'tangly1024.com' in text:\n            errors.append(str(filename) + ': old host remains in feed/sitemap')\n   \
-        \     if expected not in text:\n            errors.append(str(filename) + ': personal host absent from feed/sitemap')\n\
-        report = {'production_url': 'https://takedaiori.github.io', 'html_pages_checked': len(html_files), 'checks': ['Required\
-        \ routes', 'RSS and sitemap host', 'Canonical and Open Graph host', 'No organization-host runtime assets or meta refresh'],\
-        \ 'errors': errors, 'result': 'PASS' if not errors else 'FAIL'}\nPath('../migration-preflight-report.json').write_text(json.dumps(report,\
-        \ ensure_ascii=False, indent=2))\nprint(json.dumps(report, ensure_ascii=False, indent=2))\nif errors:\n    raise SystemExit(1)\n\
-        PY"
+      run: "python - <<'PY'\nfrom pathlib import Path\nfrom html.parser import HTMLParser\nfrom urllib.parse import urlparse\n\
+        import json\nimport xml.etree.ElementTree as ET\n\nroot = Path('out')\nexpected = 'takedaiori.github.io'\nerrors =\
+        \ []\n# These two internal routes are generated by the engine but are not public content pages.\n# Exempt only missing\
+        \ canonical; still inspect any metadata, assets, and refresh they contain.\nnon_content_routes = {'dashboard/membership.html',\
+        \ 'auth/result.html'}\nexemptions = []\n\ndef personal_url(value, label):\n    parsed = urlparse(value or '')\n  \
+        \  if parsed.scheme != 'https' or parsed.netloc != expected:\n        errors.append(label + ': expected an HTTPS URL\
+        \ on the personal host')\n\ndef exists_route(name):\n    return (root / (name + '.html')).is_file() or (root / name\
+        \ / 'index.html').is_file()\n\nfor route in ['index', 'page/1', 'archive', 'about', '404']:\n    if not exists_route(route):\n\
+        \        errors.append('Missing required route: ' + route)\nfor asset in ['sitemap.xml', 'rss/feed.xml', 'rss/atom.xml',\
+        \ 'rss/feed.json']:\n    if not (root / asset).is_file():\n        errors.append('Missing required feed/sitemap: '\
+        \ + asset)\n\nclass Inspect(HTMLParser):\n    def __init__(self, filename):\n        super().__init__()\n        self.filename\
+        \ = filename\n        self.canonicals = []\n\n    def handle_starttag(self, tag, attributes):\n        a = dict(attributes)\n\
+        \        if tag == 'link' and a.get('rel') == 'canonical':\n            value = a.get('href', '')\n            self.canonicals.append(value)\n\
+        \            personal_url(value, self.filename + ': canonical')\n        if tag == 'meta' and a.get('property') ==\
+        \ 'og:url':\n            personal_url(a.get('content', ''), self.filename + ': Open Graph URL')\n        if tag in\
+        \ ['script', 'img', 'source', 'link']:\n            value = a.get('src') or a.get('href') or ''\n            if urlparse(value).netloc\
+        \ == 'insignificantia-lab.github.io':\n                errors.append(self.filename + ': runtime asset depends on the\
+        \ organization site')\n        if tag == 'meta' and a.get('http-equiv', '').lower() == 'refresh':\n            if\
+        \ 'insignificantia-lab.github.io' in a.get('content', ''):\n                errors.append(self.filename + ': redirects\
+        \ to the organization site')\n\nhtml_files = list(root.rglob('*.html'))\nfor filename in html_files:\n    route =\
+        \ filename.relative_to(root).as_posix()\n    parser = Inspect(route)\n    parser.feed(filename.read_text(errors='replace'))\n\
+        \    if not parser.canonicals:\n        if route in non_content_routes:\n            exemptions.append(route)\n  \
+        \      else:\n            errors.append(route + ': no canonical metadata')\n\ndef parse_xml(path):\n    if not path.is_file():\n\
+        \        return None\n    try:\n        return ET.parse(path).getroot()\n    except ET.ParseError:\n        errors.append(str(path)\
+        \ + ': malformed XML')\n        return None\n\nfor filename in root.glob('sitemap*.xml'):\n    tree = parse_xml(filename)\n\
+        \    if tree is not None:\n        locations = [node for node in tree.iter() if node.tag.split('}')[-1] == 'loc']\n\
+        \        if not locations:\n            errors.append(str(filename) + ': no sitemap locations')\n        for node\
+        \ in locations:\n            personal_url(node.text, str(filename) + ': location')\n\nrss_path = root / 'rss/feed.xml'\n\
+        tree = parse_xml(rss_path)\nif tree is not None:\n    channel = tree.find('channel')\n    if channel is None:\n  \
+        \      errors.append(str(rss_path) + ': missing RSS channel')\n    else:\n        personal_url(channel.findtext('link'),\
+        \ 'RSS channel link')\n        for item in channel.findall('item'):\n            personal_url(item.findtext('link'),\
+        \ 'RSS article link')\n            guid = item.find('guid')\n            if guid is not None and guid.get('isPermaLink',\
+        \ 'true') != 'false':\n                personal_url(guid.text, 'RSS article permalink')\n\natom_path = root / 'rss/atom.xml'\n\
+        tree = parse_xml(atom_path)\nif tree is not None:\n    ns = '{http://www.w3.org/2005/Atom}'\n    if tree.tag != ns\
+        \ + 'feed':\n        errors.append(str(atom_path) + ': expected Atom feed')\n    else:\n        links = tree.findall(ns\
+        \ + 'link')\n        if not links:\n            errors.append('Atom feed: missing feed links')\n        for link in\
+        \ links:\n            personal_url(link.get('href'), 'Atom feed link')\n        for entry in tree.findall(ns + 'entry'):\n\
+        \            personal_url(entry.findtext(ns + 'id'), 'Atom entry ID')\n            for link in entry.findall(ns +\
+        \ 'link'):\n                personal_url(link.get('href'), 'Atom article link')\n\njson_path = root / 'rss/feed.json'\n\
+        if json_path.is_file():\n    try:\n        feed = json.loads(json_path.read_text())\n        personal_url(feed.get('home_page_url'),\
+        \ 'JSON feed homepage')\n        if feed.get('feed_url'):\n            personal_url(feed['feed_url'], 'JSON feed URL')\n\
+        \        for item in feed.get('items', []):\n            personal_url(item.get('url'), 'JSON feed article URL')\n\
+        \    except (ValueError, AttributeError):\n        errors.append('Malformed JSON feed')\n\nreport = {\n    'version':\
+        \ 2,\n    'production_url': 'https://takedaiori.github.io',\n    'html_pages_checked': len(html_files),\n    'canonical_exemptions':\
+        \ exemptions,\n    'checks': ['Required routes', 'RSS/Atom/JSON feed and sitemap owned URLs', 'Canonical and Open\
+        \ Graph host', 'No organization-host runtime assets or meta refresh'],\n    'errors': errors,\n    'result': 'PASS'\
+        \ if not errors else 'FAIL',\n}\nPath('../migration-preflight-report.json').write_text(json.dumps(report, ensure_ascii=False,\
+        \ indent=2))\nprint(json.dumps(report, ensure_ascii=False, indent=2))\nif errors:\n    raise SystemExit(1)\nPY"
     - name: Package tracked source with migration fixes
       run: "python - <<'PY'\nimport os\nimport subprocess\nimport zipfile\nfrom pathlib import Path\nroot = Path(os.environ['MIGRATION_ROOT'])\n\
         paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')\npaths = [p for p in paths if p] +\
