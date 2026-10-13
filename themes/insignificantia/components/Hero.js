@@ -69,7 +69,10 @@ const Hero = () => {
         </div>
 
         <div className='ins-hero-visual'>
-          <div className='ins-carousel' aria-label='视觉作品轮播'>
+          <div
+            className='ins-carousel'
+            aria-label='视觉作品轮播'
+            style={{ aspectRatio: '1 / 1' }}>
             <div className='ins-carousel-track'>
               {SLIDES.map((slide, index) => {
                 const isActive = index === current
