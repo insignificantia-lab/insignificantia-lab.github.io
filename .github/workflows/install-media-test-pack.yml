@@ -1,6 +1,13 @@
 name: Install HQ media test pack
 
 on:
+  workflow_dispatch:
+    inputs:
+      package_name:
+        description: 'HQ test ZIP at repository root'
+        required: true
+        default: 'Insignificantia-media-test-HQ.zip'
+        type: string
   push:
     branches:
       - main
@@ -19,25 +26,37 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Skip if pack was already consumed
+      - name: Resolve HQ test package
         id: pack
         shell: bash
         run: |
-          if [[ -f Insignificantia-media-test-HQ.zip ]]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            PACK='${{ inputs.package_name }}'
           else
-            echo "present=false" >> "$GITHUB_OUTPUT"
-            echo "Media pack is no longer present; nothing to do."
+            PACK='Insignificantia-media-test-HQ.zip'
           fi
 
+          if [[ -z "$PACK" || "$PACK" == */* || "$PACK" != *.zip ]]; then
+            echo "Invalid package name: $PACK"
+            echo "The ZIP must be stored at the repository root."
+            exit 1
+          fi
+
+          if [[ ! -f "$PACK" ]]; then
+            echo "Package not found at repository root: $PACK"
+            exit 1
+          fi
+
+          echo "name=$PACK" >> "$GITHUB_OUTPUT"
+
       - name: Extract HQ test media
-        if: steps.pack.outputs.present == 'true'
         shell: bash
+        env:
+          PACK: ${{ steps.pack.outputs.name }}
         run: |
-          unzip -o Insignificantia-media-test-HQ.zip -d .
+          unzip -o "$PACK" -d .
 
       - name: Verify exact test payload
-        if: steps.pack.outputs.present == 'true'
         shell: bash
         run: |
           test "$(stat -c %s public/images/insignificantia/hero/hero-01.webp)" -eq 280476
@@ -48,8 +67,9 @@ jobs:
           test "$(stat -c %s public/images/insignificantia/portfolio/work-03.webp)" -eq 139884
 
       - name: Commit installed media and consume pack
-        if: steps.pack.outputs.present == 'true'
         shell: bash
+        env:
+          PACK: ${{ steps.pack.outputs.name }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -59,6 +79,13 @@ jobs:
           git add public/images/insignificantia/portfolio/work-01.webp
           git add public/images/insignificantia/portfolio/work-02.webp
           git add public/images/insignificantia/portfolio/work-03.webp
-          git rm Insignificantia-media-test-HQ.zip
+          git rm -f -- "$PACK"
+
+          if git diff --cached --quiet; then
+            echo "No repository changes to commit."
+            exit 0
+          fi
+
           git commit -m "Visual test: install high-quality media assets"
-          git push
+          git pull --rebase origin main
+          git push origin HEAD:main
