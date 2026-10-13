@@ -1,58 +1,58 @@
 export const MotionStyle = () => {
   return (
     <style jsx global>{`
-      .ins-page-transition {
-        opacity: 1;
-        transform: translateY(0);
-        transition:
-          opacity 260ms ease,
-          transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+      /*
+       * Page entrance: header/nav is intentionally outside this wrapper.
+       * The motion is deliberately more visible than the previous 7px/260ms
+       * transition so it reads as a conventional modern fade-up entrance.
+       */
+      .ins-page-enter {
+        animation: ins-page-rise-in 680ms cubic-bezier(0.22, 1, 0.36, 1) 45ms both;
         will-change: opacity, transform;
       }
 
-      .ins-page-transition.is-entering {
-        opacity: 0;
-        transform: translateY(7px);
+      @keyframes ins-page-rise-in {
+        from {
+          opacity: 0;
+          transform: translate3d(0, 28px, 0);
+        }
+        to {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
       }
 
-      .ins-page-transition.is-entered {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .ins-page-transition.is-leaving {
-        opacity: 0;
-        transform: translateY(-5px);
-      }
-
+      /*
+       * Hero carousel: every incoming work moves from right to centre while
+       * fading in; the outgoing work moves left while fading out. The 7-second
+       * rotation interval remains controlled by Hero.js.
+       */
       .ins-slide {
-        transform: translateX(5%);
+        opacity: 0;
+        transform: translate3d(14%, 0, 0);
         transition:
-          opacity 560ms ease,
-          transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+          opacity 720ms ease,
+          transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
         will-change: opacity, transform;
       }
 
       .ins-slide.active {
         opacity: 1;
-        transform: translateX(0);
+        transform: translate3d(0, 0, 0);
         z-index: 2;
       }
 
       .ins-slide.is-leaving {
         opacity: 0;
-        transform: translateX(-5%);
+        transform: translate3d(-14%, 0, 0);
         z-index: 1;
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .ins-page-transition,
-        .ins-page-transition.is-entering,
-        .ins-page-transition.is-entered,
-        .ins-page-transition.is-leaving {
+        .ins-page-enter {
           opacity: 1 !important;
           transform: none !important;
-          transition: none !important;
+          animation: none !important;
         }
 
         .ins-slide,
