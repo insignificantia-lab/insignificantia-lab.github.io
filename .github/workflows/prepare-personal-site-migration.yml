@@ -71,6 +71,28 @@ jobs:
     - name: Install dependencies
       working-directory: ${{ env.MIGRATION_ROOT }}
       run: yarn install --frozen-lockfile
+    - name: Confirm the metadata regression
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: |
+        cp pages/_app.js "$RUNNER_TEMP/phase1-fixed-app.js"
+        trap 'cp "$RUNNER_TEMP/phase1-fixed-app.js" pages/_app.js' EXIT
+        python - <<'PY'
+        from pathlib import Path
+        p = Path('pages/_app.js')
+        fixed = "        {/* Metadata must render even while the dynamic theme layout is loading. */}\\n        <SEO {...pageProps} />\\n        <GLayout {...pageProps}>"
+        original = "        <GLayout {...pageProps}>\\n          <SEO {...pageProps} />"
+        s = p.read_text()
+        if s.count(fixed) != 1:
+            raise SystemExit('Unexpected SEO placement')
+        p.write_text(s.replace(fixed, original, 1))
+        PY
+        if yarn test --runInBand __tests__/pages/app-seo.test.js > "$RUNNER_TEMP/phase1-before.log" 2>&1; then
+          echo 'Regression test unexpectedly passed before the fix.'
+          exit 1
+        fi
+        cat "$RUNNER_TEMP/phase1-before.log"
+        cp "$RUNNER_TEMP/phase1-fixed-app.js" pages/_app.js
+        yarn test --runInBand __tests__/pages/app-seo.test.js
     - name: Check code
       working-directory: ${{ env.MIGRATION_ROOT }}
       run: yarn lint && yarn type-check && yarn test --runInBand __tests__/pages/app-seo.test.js __tests__/components/SEO.test.js
@@ -137,7 +159,7 @@ jobs:
         \        personal_url(feed.get('home_page_url'), 'JSON feed homepage')\n        if feed.get('feed_url'):\n       \
         \     personal_url(feed['feed_url'], 'JSON feed URL')\n        for item in feed.get('items', []):\n            personal_url(item.get('url'),\
         \ 'JSON feed article URL')\n    except (ValueError, AttributeError):\n        errors.append('Malformed JSON feed')\n\
-        \nreport = {\n    'version': 3,\n    'production_url': 'https://takedaiori.github.io',\n    'html_pages_checked':\
+        \nreport = {\n    'version': 4,\n    'production_url': 'https://takedaiori.github.io',\n    'html_pages_checked':\
         \ len(html_files),\n    'canonical_exemptions': exemptions,\n    'checks': ['Required routes', 'RSS/Atom/JSON feed\
         \ and sitemap owned URLs', 'Canonical and Open Graph host', 'No organization-host runtime assets or meta refresh'],\n\
         \    'errors': errors,\n    'result': 'PASS' if not errors else 'FAIL',\n}\nPath('../migration-preflight-report.json').write_text(json.dumps(report,\
