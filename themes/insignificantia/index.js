@@ -1,9 +1,12 @@
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import { Style } from './style'
 import { ArticleStyle } from './ArticleStyle'
 import { ArchiveStyle } from './ArchiveStyle'
 import { ArticleDetailStyle } from './ArticleDetailStyle'
 import { AboutStyle } from './AboutStyle'
 import { IntegrationOverrides } from './IntegrationOverrides'
+import { MotionStyle } from './MotionStyle'
 import CONFIG from './config'
 import SiteHeader from './components/SiteHeader'
 import SiteFooter from './components/SiteFooter'
@@ -14,7 +17,62 @@ import ArchiveResultPage from './components/ArchiveResultPage'
 import ArticleDetailPage from './components/ArticleDetailPage'
 import AboutPage from './components/AboutPage'
 
+const PageTransition = ({ children, disabled = false }) => {
+  const router = useRouter()
+  const [phase, setPhase] = useState('is-entering')
+
+  useEffect(() => {
+    if (disabled) {
+      setPhase('is-entered')
+      return undefined
+    }
+
+    let frameA
+    let frameB
+
+    const enter = () => {
+      setPhase('is-entering')
+      frameA = window.requestAnimationFrame(() => {
+        frameB = window.requestAnimationFrame(() => {
+          setPhase('is-entered')
+        })
+      })
+    }
+
+    const leave = () => {
+      setPhase('is-leaving')
+    }
+
+    enter()
+    router.events.on('routeChangeStart', leave)
+    router.events.on('routeChangeComplete', enter)
+    router.events.on('routeChangeError', enter)
+
+    return () => {
+      router.events.off('routeChangeStart', leave)
+      router.events.off('routeChangeComplete', enter)
+      router.events.off('routeChangeError', enter)
+      if (frameA) window.cancelAnimationFrame(frameA)
+      if (frameB) window.cancelAnimationFrame(frameB)
+    }
+  }, [disabled, router.events])
+
+  if (disabled) {
+    return <>{children}</>
+  }
+
+  return (
+    <div className={`ins-page-transition ${phase}`}>
+      {children}
+    </div>
+  )
+}
+
 const LayoutBase = props => {
+  const slug = String(props?.post?.slug || props?.slug || '').toLowerCase()
+  const postType = String(props?.post?.type || '').toLowerCase()
+  const isArticleDetail = postType === 'post' && slug !== 'about'
+
   return (
     <div id='theme-insignificantia'>
       <Style />
@@ -23,8 +81,13 @@ const LayoutBase = props => {
       <ArticleDetailStyle />
       <AboutStyle />
       <IntegrationOverrides />
+      <MotionStyle />
       <SiteHeader />
-      <div className='ins-page-shell'>{props.children}</div>
+      <div className='ins-page-shell'>
+        <PageTransition disabled={isArticleDetail}>
+          {props.children}
+        </PageTransition>
+      </div>
       <SiteFooter />
     </div>
   )

@@ -10,17 +10,32 @@ const SLIDES = [
 
 const Hero = () => {
   const [current, setCurrent] = useState(0)
+  const [previous, setPrevious] = useState(null)
 
   const show = index => {
-    setCurrent((index + SLIDES.length) % SLIDES.length)
+    const next = (index + SLIDES.length) % SLIDES.length
+    if (next === current) return
+    setPrevious(current)
+    setCurrent(next)
   }
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setCurrent(value => (value + 1) % SLIDES.length)
+      setCurrent(value => {
+        setPrevious(value)
+        return (value + 1) % SLIDES.length
+      })
     }, 7000)
     return () => window.clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    if (previous === null) return undefined
+    const timer = window.setTimeout(() => {
+      setPrevious(null)
+    }, 650)
+    return () => window.clearTimeout(timer)
+  }, [current, previous])
 
   return (
     <section className='ins-hero'>
@@ -44,15 +59,19 @@ const Hero = () => {
         <div className='ins-hero-visual'>
           <div className='ins-carousel' aria-label='视觉作品轮播'>
             <div className='ins-carousel-track'>
-              {SLIDES.map((slide, index) => (
-                <div
-                  key={slide.label}
-                  className={`ins-slide ${slide.className} ${
-                    index === current ? 'active' : ''
-                  }`}>
-                  <span className='ins-slide-label'>{slide.label}</span>
-                </div>
-              ))}
+              {SLIDES.map((slide, index) => {
+                const isActive = index === current
+                const isLeaving = index === previous && !isActive
+                return (
+                  <div
+                    key={slide.label}
+                    className={`ins-slide ${slide.className} ${
+                      isActive ? 'active' : ''
+                    } ${isLeaving ? 'is-leaving' : ''}`}>
+                    <span className='ins-slide-label'>{slide.label}</span>
+                  </div>
+                )
+              })}
             </div>
 
             <button
