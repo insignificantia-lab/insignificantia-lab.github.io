@@ -126,8 +126,8 @@ jobs:
         \ indent=2))\nprint(json.dumps(report, ensure_ascii=False, indent=2))\nif errors:\n    raise SystemExit(1)\nPY"
     - name: Package tracked source with migration fixes
       run: "python - <<'PY'\nimport os\nimport subprocess\nimport zipfile\nfrom pathlib import Path\nroot = Path(os.environ['MIGRATION_ROOT'])\n\
-        paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')\npaths = [p for p in paths if p] +\
-        \ ['MIGRATION-BASELINE.json']\nwith zipfile.ZipFile(Path(os.environ['RUNNER_TEMP']) / 'Insignificantia-personal-site-source.zip',\
+        paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split(chr(0))\npaths = [p for p in paths if p]\
+        \ + ['MIGRATION-BASELINE.json']\nwith zipfile.ZipFile(Path(os.environ['RUNNER_TEMP']) / 'Insignificantia-personal-site-source.zip',\
         \ 'w', zipfile.ZIP_DEFLATED) as z:\n    for name in paths:\n        if name in ['.env', '.env.local', '.env.production',\
         \ '.env.development']:\n            raise SystemExit('Do not package a real environment credential file')\n      \
         \  p = root / name\n        if p.is_file():\n            z.write(p, name)\nprint('Packaged source only, without dependencies,\
