@@ -86,8 +86,9 @@ const MyApp = ({ Component, pageProps }) => {
   const content = (
     <AppErrorBoundary>
       <GlobalContextProvider {...pageProps}>
+        {/* Metadata must render even while the dynamic theme layout is loading. */}
+        <SEO {...pageProps} />
         <GLayout {...pageProps}>
-          <SEO {...pageProps} />
           <Component {...pageProps} />
         </GLayout>
         <PWAInstaller NOTION_CONFIG={pageProps?.NOTION_CONFIG} />
