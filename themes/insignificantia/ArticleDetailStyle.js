@@ -171,80 +171,162 @@ export const ArticleDetailStyle = () => {
         letter-spacing: 0.02em;
       }
 
-      /* Compact TOC: article stays centered; closed state is only 42px wide. */
-      .ins-toc-dock {
-        position: absolute;
-        top: 8px;
-        left: calc(100% + 22px);
-        width: 42px;
-        z-index: 20;
+      /* Independent viewport drawer; no full-page overlay or scroll lock. */
+      .ins-reading-toc,
+      .ins-reading-toc * {
+        box-sizing: border-box;
       }
 
-      .ins-toc-trigger {
-        width: 42px;
-        height: 42px;
-        padding: 0;
-        border: 1px solid var(--ins-line-strong);
-        border-radius: var(--ins-radius);
-        background: rgba(32, 45, 53, 0.88);
-        color: var(--ins-muted);
+      .ins-reading-toc {
+        position: fixed;
+        top: 50%;
+        left: calc(50% + 477px);
+        transform: translateY(-50%);
+        width: 44px;
+        z-index: 60;
+        font-family: var(--ins-ui-font);
+      }
+
+      .ins-reading-toc-trigger {
+        width: 44px;
+        min-height: 176px;
+        max-height: 55vh;
+        padding: 14px 10px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 4px;
-        cursor: pointer;
-        transition:
-          color 160ms ease,
-          border-color 160ms ease,
-          background 160ms ease;
-      }
-
-      .ins-toc-trigger span {
-        width: 16px;
-        height: 1.5px;
-        background: currentColor;
-        border-radius: 999px;
-      }
-
-      .ins-toc-trigger:hover,
-      .ins-toc-trigger[aria-expanded="true"] {
-        color: var(--ins-pink);
-        border-color: rgba(237, 142, 172, 0.62);
-        background: rgba(43, 57, 66, 0.96);
-      }
-
-      .ins-toc-popover {
-        position: absolute;
-        right: 52px;
-        top: 0;
-        width: 260px;
-        max-height: min(68vh, 560px);
-        overflow-y: auto;
-        padding: 14px 16px;
-        border: 1px solid var(--ins-line);
-        border-radius: var(--ins-radius);
-        background: rgba(27, 39, 46, 0.98);
+        gap: 18px;
+        border: 1px solid var(--ins-line-strong);
+        border-radius: 14px;
+        background: rgba(27, 39, 46, 0.96);
         box-shadow: var(--ins-shadow-soft);
-        backdrop-filter: blur(10px);
+        color: var(--ins-muted);
+        font: inherit;
+        cursor: pointer;
+        touch-action: manipulation;
+        transition: color 160ms ease, border-color 160ms ease;
       }
 
-      .ins-toc-popover a {
+      .ins-reading-toc-trigger:hover,
+      .ins-reading-toc-trigger[aria-expanded="true"] {
+        color: var(--ins-pink);
+        border-color: var(--ins-pink);
+      }
+
+      .ins-reading-toc-trigger:focus-visible,
+      .ins-reading-toc-panel a:focus-visible {
+        outline: 2px solid var(--ins-pink);
+        outline-offset: 3px;
+      }
+
+      .ins-reading-toc-label {
+        writing-mode: vertical-rl;
+        font-size: 12px;
+        letter-spacing: 0.2em;
+      }
+
+      .ins-reading-toc-marks {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 7px;
+      }
+
+      .ins-reading-toc-marks > span {
+        width: 18px;
+        height: 2px;
+        background: currentColor;
+        border-radius: 2px;
+      }
+
+      .ins-reading-toc-marks > span.is-sub {
+        width: 11px;
+        opacity: 0.65;
+      }
+
+      .ins-reading-toc-panel {
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        width: min(280px, calc(100vw - 88px));
+        max-height: min(72vh, 580px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 18px;
+        border: 1px solid var(--ins-line-strong);
+        border-radius: 12px;
+        background: rgba(27, 39, 46, 0.98);
+        box-shadow: var(--ins-shadow);
+        color: var(--ins-text);
+      }
+
+      .ins-reading-toc-heading {
+        margin-bottom: 10px;
+        color: var(--ins-pink);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .ins-reading-toc-panel a {
         display: block;
-        padding: 7px 4px;
-        color: var(--ins-muted) !important;
+        padding: 10px 4px;
+        color: var(--ins-muted);
         font-size: 13px;
-        line-height: 1.55;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+        text-decoration: none;
       }
 
-      .ins-toc-popover a.is-sub {
+      .ins-reading-toc-panel a.is-sub {
         padding-left: 16px;
-        font-size: 12.5px;
       }
 
-      .ins-toc-popover a:hover {
-        color: var(--ins-pink) !important;
-        text-decoration: none !important;
+      .ins-reading-toc-panel a:hover {
+        color: var(--ins-pink);
+      }
+
+      .ins-notion-content h1,
+      .ins-notion-content h2,
+      .ins-notion-content h3,
+      .ins-notion-content h4,
+      .ins-notion-content .notion-h1,
+      .ins-notion-content .notion-h2,
+      .ins-notion-content .notion-h3,
+      .ins-notion-content .notion-h4 {
+        scroll-margin-top: 32px;
+      }
+
+      @media (max-width: 1199px) {
+        .ins-reading-toc {
+          left: auto;
+          right: 16px;
+        }
+      }
+
+      @media (max-width: 980px) {
+        #theme-insignificantia .ins-article-safe-frame {
+          width: calc(100% - 100px) !important;
+          margin-left: 20px !important;
+          margin-right: 80px !important;
+        }
+
+        .ins-reading-toc {
+          width: 40px;
+          right: 14px;
+        }
+
+        .ins-reading-toc-trigger {
+          width: 40px;
+          min-height: 160px;
+          padding: 12px 8px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ins-reading-toc-trigger {
+          transition: none;
+        }
       }
 
       .ins-article-end {
@@ -309,12 +391,6 @@ export const ArticleDetailStyle = () => {
         margin: 0 auto;
         padding: 100px 0;
         color: var(--ins-muted-2);
-      }
-
-      @media (max-width: 980px) {
-        .ins-toc-dock {
-          display: none;
-        }
       }
 
       @media (max-width: 760px) {

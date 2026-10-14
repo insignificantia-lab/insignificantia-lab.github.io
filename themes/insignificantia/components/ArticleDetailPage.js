@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef } from 'react'
+import ArticleToc from './ArticleToc'
 import NotionPage from '@/components/NotionPage'
 
 const normalizeTag = tag => {
@@ -21,7 +22,7 @@ const ArticleDetailPage = ({
   next,
   toc: tocProp
 }) => {
-  const [tocOpen, setTocOpen] = useState(false)
+  const articleRef = useRef(null)
 
   if (!post) {
     return (
@@ -54,6 +55,7 @@ const ArticleDetailPage = ({
         boxSizing: 'border-box'
       }}>
       <div
+        className='ins-article-safe-frame'
         data-safe-frame='article-detail-v1.11'
         style={{
           width: 'calc(100% - 40px)',
@@ -74,7 +76,7 @@ const ArticleDetailPage = ({
 
       <div className='ins-article-layout'>
         <article className='ins-article-body'>
-<div className='ins-notion-content'>
+<div ref={articleRef} className='ins-notion-content'>
             <NotionPage post={post} />
           </div>
 
@@ -118,70 +120,7 @@ const ArticleDetailPage = ({
           </footer>
         </article>
 
-        {toc.length > 0 && (
-          <aside className='ins-toc-dock'>
-            <button
-              type='button'
-              className='ins-toc-trigger'
-              aria-label='打开文章目录'
-              aria-expanded={tocOpen}
-              onClick={() =>
-                setTocOpen(value => !value)
-              }>
-              <span />
-              <span />
-              <span />
-            </button>
-
-            {tocOpen && (
-              <nav
-                className='ins-toc-popover'
-                aria-label='文章目录'>
-                {toc.map((item, index) => {
-                  const id =
-                    item?.id ||
-                    item?.blockId ||
-                    item?.uuid ||
-                    ''
-
-                  const text =
-                    item?.text ||
-                    item?.title ||
-                    item?.value ||
-                    ''
-
-                  const level =
-                    item?.indentLevel ??
-                    item?.level ??
-                    0
-
-                  if (!text) return null
-
-                  return (
-                    <a
-                      key={
-                        id ||
-                        `${text}-${index}`
-                      }
-                      href={
-                        id ? `#${id}` : '#'
-                      }
-                      className={
-                        Number(level) > 0
-                          ? 'is-sub'
-                          : ''
-                      }
-                      onClick={() =>
-                        setTocOpen(false)
-                      }>
-                      {text}
-                    </a>
-                  )
-                })}
-              </nav>
-            )}
-          </aside>
-        )}
+        <ArticleToc items={toc} articleRef={articleRef} postId={post.id || post.slug} />
       </div>
       </div>
     </main>

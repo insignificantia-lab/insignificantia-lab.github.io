@@ -54,58 +54,6 @@ export const IntegrationOverrides = () => {
         display: block !important;
       }
 
-      /* Compact TOC button: it floats outside the centered 810px column. */
-      #theme-insignificantia .ins-toc-dock {
-        position: absolute !important;
-        top: 8px !important;
-        left: calc(100% + 22px) !important;
-        width: 42px !important;
-        z-index: 40 !important;
-      }
-
-      #theme-insignificantia .ins-toc-trigger {
-        width: 42px !important;
-        height: 42px !important;
-        min-width: 42px !important;
-        padding: 0 !important;
-        border: 1px solid rgba(225, 231, 226, 0.18) !important;
-        border-radius: 9px !important;
-        background: rgba(32, 45, 53, 0.92) !important;
-        color: #aeb9b9 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 4px !important;
-      }
-
-      #theme-insignificantia .ins-toc-trigger span {
-        width: 16px !important;
-        height: 1.5px !important;
-        background: currentColor !important;
-        border-radius: 999px !important;
-      }
-
-      #theme-insignificantia .ins-toc-trigger:hover,
-      #theme-insignificantia .ins-toc-trigger[aria-expanded='true'] {
-        color: #ed8eac !important;
-        border-color: rgba(237, 142, 172, 0.62) !important;
-        background: rgba(43, 57, 66, 0.96) !important;
-      }
-
-      #theme-insignificantia .ins-toc-popover {
-        position: absolute !important;
-        right: 52px !important;
-        top: 0 !important;
-        width: 260px !important;
-        max-height: min(68vh, 560px) !important;
-        overflow-y: auto !important;
-        background: rgba(27, 39, 46, 0.98) !important;
-        border: 1px solid rgba(225, 231, 226, 0.10) !important;
-        border-radius: 9px !important;
-        box-shadow: 0 16px 38px rgba(5,12,16,.25), 0 3px 10px rgba(5,12,16,.18) !important;
-      }
-
       /* 3) ARTICLE and Archive-result list emphasis */
       #theme-insignificantia .ins-article-list-date,
       #theme-insignificantia .ins-read-more {
@@ -185,12 +133,6 @@ export const IntegrationOverrides = () => {
         max-width: 1400px !important;
         margin-left: auto !important;
         margin-right: auto !important;
-      }
-
-      @media (max-width: 980px) {
-        #theme-insignificantia .ins-toc-dock {
-          display: none !important;
-        }
       }
 
       @media (max-width: 760px) {
