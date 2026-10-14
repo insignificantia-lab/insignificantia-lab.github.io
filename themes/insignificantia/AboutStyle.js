@@ -143,6 +143,15 @@ export const AboutStyle = () => {
           linear-gradient(125deg, #23333c 0 42%, #74495a 43% 45%, #334852 46%);
       }
 
+      .ins-lightbox,
+      .ins-lightbox * {
+        box-sizing: border-box;
+      }
+
+      .ins-lightbox-close {
+        font-family: inherit;
+      }
+
       .ins-lightbox {
         position: fixed;
         inset: 0;
@@ -166,7 +175,8 @@ export const AboutStyle = () => {
       }
 
       .ins-lightbox-image {
-        width: min(430px, 82vw);
+        width: min(430px, 82vw, calc((100vh - 160px) * 9 / 16));
+        width: min(430px, 82vw, calc((100dvh - 160px) * 9 / 16));
         aspect-ratio: 9 / 16;
         overflow: hidden;
         border-radius: var(--ins-radius);

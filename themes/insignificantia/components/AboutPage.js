@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 const SOCIALS = [
   {
@@ -204,7 +205,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {lightbox && (
+      {lightbox && createPortal(
         <div
           className='ins-lightbox'
           role='dialog'
@@ -253,7 +254,8 @@ const AboutPage = () => {
               <strong>{lightbox.title}</strong>
             </p>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </main>
   )
