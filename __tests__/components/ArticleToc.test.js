@@ -70,12 +70,22 @@ it('closes with Escape and honors reduced motion for navigation', () => {
   unmount()
 })
 
-it('uses exactly three marks without visible menu labels', () => {
+it('uses one mark per heading without visible menu labels', () => {
   const { unmount } = mount()
   const trigger = screen.getByRole('button', { name: '展开文章目录' })
   expect(trigger.textContent).toBe('')
-  expect(trigger.querySelectorAll('.ins-reading-toc-marks > span')).toHaveLength(3)
+  expect(trigger.querySelectorAll('.ins-reading-toc-marks > span')).toHaveLength(items.length)
   fireEvent.click(trigger)
   expect(screen.getByRole('navigation', { name: '文章目录' }).textContent).toBe('First heading')
+  unmount()
+})
+
+it('updates marks when heading count changes and omits empty headings', () => {
+  const { rerender, unmount } = mount()
+  const headings = Array.from({ length: 7 }, (_, index) => ({ id: 'heading-' + index, text: 'Heading ' + index }))
+  rerender(<ArticleToc items={[...headings, { id: 'empty', text: '' }]} articleRef={{ current: root }} postId='post-two' />)
+  expect(document.querySelectorAll('.ins-reading-toc-marks > span')).toHaveLength(7)
+  rerender(<ArticleToc items={[]} articleRef={{ current: root }} postId='post-three' />)
+  expect(document.querySelector('.ins-reading-toc')).toBeNull()
   unmount()
 })

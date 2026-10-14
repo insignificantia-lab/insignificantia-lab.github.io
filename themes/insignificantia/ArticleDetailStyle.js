@@ -189,7 +189,8 @@ export const ArticleDetailStyle = () => {
 
       .ins-reading-toc-trigger {
         width: 44px;
-        height: 108px;
+        height: auto;
+        max-height: 72vh;
         padding: 12px;
         display: flex;
         align-items: center;
@@ -213,14 +214,29 @@ export const ArticleDetailStyle = () => {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 5px;
+        gap: min(5px, calc(8vh / var(--ins-toc-count)));
+        max-height: calc(68vh - 24px);
+        overflow-y: auto;
+        scrollbar-width: none;
+      }
+
+      .ins-reading-toc-marks::-webkit-scrollbar {
+        display: none;
       }
 
       .ins-reading-toc-marks > span {
         width: 4px;
         height: 24px;
+        min-height: 1px;
+        max-height: 24px;
+        flex: 1 1 24px;
         border-radius: 999px;
         background: currentColor;
+        transition: background-color 180ms ease;
+      }
+
+      .ins-reading-toc-marks > span:hover {
+        background: var(--ins-pink);
       }
 
       .ins-reading-toc-panel {
@@ -230,6 +246,7 @@ export const ArticleDetailStyle = () => {
         top: 50%;
         transform: translateY(-50%);
         width: min(260px, calc(50vw - 541px));
+        animation: ins-toc-drawer-in 220ms ease-out both;
         max-height: min(72vh, 580px);
         overflow-y: auto;
         overscroll-behavior: contain;
@@ -239,6 +256,17 @@ export const ArticleDetailStyle = () => {
         background: var(--ins-bg);
         box-shadow: none;
         color: var(--ins-muted);
+      }
+
+      @keyframes ins-toc-drawer-in {
+        from {
+          opacity: 0;
+          transform: translate(-12px, -50%);
+        }
+        to {
+          opacity: 1;
+          transform: translate(0, -50%);
+        }
       }
 
       .ins-reading-toc-panel a {
@@ -264,6 +292,12 @@ export const ArticleDetailStyle = () => {
       }
 
       @media (prefers-reduced-motion: reduce) {
+        .ins-reading-toc-panel {
+          animation: none;
+        }
+        .ins-reading-toc-marks > span {
+          transition: none;
+        }
         .ins-reading-toc-panel a {
           transition: none;
         }

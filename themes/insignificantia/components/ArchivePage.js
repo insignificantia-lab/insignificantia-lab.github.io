@@ -53,6 +53,25 @@ const categorySort = (a, b) => {
   )
 }
 
+const renderCategory = (option, index) => {
+          const category = normalizeOption(option)
+          if (!category.name) return null
+
+          return (
+            <Link
+              key={`${category.name}-${index}`}
+              href={`/category/${encodeURIComponent(
+                category.name
+              )}`}
+              className='ins-archive-card'>
+              <strong>{category.name}</strong>
+              {category.count !== '' && (
+                <small>{category.count} ARTICLES</small>
+              )}
+            </Link>
+          )
+        }
+
 const ArchivePage = props => {
   const router = useRouter()
   const selectedYear = router?.query?.year
@@ -123,24 +142,7 @@ const ArchivePage = props => {
       <section
         className='ins-archive-grid'
         aria-label='按分类浏览'>
-        {categories.map((option, index) => {
-          const category = normalizeOption(option)
-          if (!category.name) return null
-
-          return (
-            <Link
-              key={`${category.name}-${index}`}
-              href={`/category/${encodeURIComponent(
-                category.name
-              )}`}
-              className='ins-archive-card'>
-              <strong>{category.name}</strong>
-              {category.count !== '' && (
-                <small>{category.count} ARTICLES</small>
-              )}
-            </Link>
-          )
-        })}
+        {categories.filter(option => normalizeOption(option).name !== 'WPD Archive').map(renderCategory)}
       </section>
 
       <section
@@ -155,6 +157,7 @@ const ArchivePage = props => {
             <small>YEAR</small>
           </Link>
         ))}
+        {categories.filter(option => normalizeOption(option).name === 'WPD Archive').map(renderCategory)}
       </section>
       </div>
     </main>

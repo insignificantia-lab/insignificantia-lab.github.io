@@ -69,6 +69,7 @@ const ArticleToc = ({ items, articleRef, postId }) => {
     <aside
       ref={dockRef}
       className='ins-reading-toc'
+      style={{ '--ins-toc-count': entries.length }}
       data-open={open}
       onPointerEnter={event => {
         if (event.pointerType === 'mouse') setOpen(true)
@@ -88,9 +89,9 @@ const ArticleToc = ({ items, articleRef, postId }) => {
         aria-controls='ins-reading-toc-list'
         onClick={() => setOpen(value => !value)}>
         <span className='ins-reading-toc-marks' aria-hidden='true'>
-          <span />
-          <span />
-          <span />
+          {entries.map((item, index) => (
+            <span key={item.id || item.blockId || item.uuid || index} />
+          ))}
         </span>
       </button>
       {open && (
