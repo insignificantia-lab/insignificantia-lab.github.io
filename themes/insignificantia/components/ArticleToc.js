@@ -87,16 +87,14 @@ const ArticleToc = ({ items, articleRef, postId }) => {
         aria-expanded={open}
         aria-controls='ins-reading-toc-list'
         onClick={() => setOpen(value => !value)}>
-        <span className='ins-reading-toc-label'>目录</span>
         <span className='ins-reading-toc-marks' aria-hidden='true'>
-          {entries.slice(0, 12).map((item, index) => (
-            <span key={index} className={Number(item.indentLevel ?? item.level ?? 0) > 0 ? 'is-sub' : ''} />
-          ))}
+          <span />
+          <span />
+          <span />
         </span>
       </button>
       {open && (
         <nav id='ins-reading-toc-list' className='ins-reading-toc-panel' aria-label='文章目录'>
-          <div className='ins-reading-toc-heading'>文章目录</div>
           {entries.map((item, index) => {
             const id = item.id || item.blockId || item.uuid || ''
             return (

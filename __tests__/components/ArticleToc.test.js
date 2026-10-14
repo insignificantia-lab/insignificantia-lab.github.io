@@ -69,3 +69,13 @@ it('closes with Escape and honors reduced motion for navigation', () => {
   expect(root.firstChild.scrollIntoView).toHaveBeenCalledWith({ block: 'start', behavior: 'auto' })
   unmount()
 })
+
+it('uses exactly three marks without visible menu labels', () => {
+  const { unmount } = mount()
+  const trigger = screen.getByRole('button', { name: '展开文章目录' })
+  expect(trigger.textContent).toBe('')
+  expect(trigger.querySelectorAll('.ins-reading-toc-marks > span')).toHaveLength(3)
+  fireEvent.click(trigger)
+  expect(screen.getByRole('navigation', { name: '文章目录' }).textContent).toBe('First heading')
+  unmount()
+})
