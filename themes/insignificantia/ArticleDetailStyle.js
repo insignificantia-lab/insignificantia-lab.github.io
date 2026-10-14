@@ -171,7 +171,7 @@ export const ArticleDetailStyle = () => {
         letter-spacing: 0.02em;
       }
 
-      /* Independent viewport drawer; no full-page overlay or scroll lock. */
+      /* Reuse the viewport drawer with an unframed, page-colored appearance. */
       .ins-reading-toc,
       .ins-reading-toc * {
         box-sizing: border-box;
@@ -189,89 +189,61 @@ export const ArticleDetailStyle = () => {
 
       .ins-reading-toc-trigger {
         width: 44px;
-        min-height: 176px;
-        max-height: 55vh;
-        padding: 14px 10px;
+        height: 64px;
+        padding: 12px;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 18px;
-        border: 1px solid var(--ins-line-strong);
-        border-radius: 14px;
-        background: rgba(27, 39, 46, 0.96);
-        box-shadow: var(--ins-shadow-soft);
+        justify-content: center;
+        border: 0;
+        border-radius: 0;
+        background: var(--ins-bg);
+        box-shadow: none;
         color: var(--ins-muted);
         font: inherit;
         cursor: pointer;
-        touch-action: manipulation;
-        transition: color 160ms ease, border-color 160ms ease;
-      }
-
-      .ins-reading-toc-trigger:hover,
-      .ins-reading-toc-trigger[aria-expanded="true"] {
-        color: var(--ins-pink);
-        border-color: var(--ins-pink);
       }
 
       .ins-reading-toc-trigger:focus-visible,
       .ins-reading-toc-panel a:focus-visible {
-        outline: 2px solid var(--ins-pink);
+        outline: 1px solid currentColor;
         outline-offset: 3px;
-      }
-
-      .ins-reading-toc-label {
-        writing-mode: vertical-rl;
-        font-size: 12px;
-        letter-spacing: 0.2em;
       }
 
       .ins-reading-toc-marks {
         display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 7px;
+        flex-direction: row;
+        align-items: center;
+        gap: 5px;
       }
 
       .ins-reading-toc-marks > span {
-        width: 18px;
-        height: 2px;
+        width: 2px;
+        height: 28px;
         background: currentColor;
-        border-radius: 2px;
-      }
-
-      .ins-reading-toc-marks > span.is-sub {
-        width: 11px;
-        opacity: 0.65;
       }
 
       .ins-reading-toc-panel {
         position: absolute;
-        right: 100%;
+        left: 100%;
+        right: auto;
         top: 50%;
         transform: translateY(-50%);
-        width: min(280px, calc(100vw - 88px));
+        width: min(260px, calc(50vw - 541px));
         max-height: min(72vh, 580px);
         overflow-y: auto;
         overscroll-behavior: contain;
-        padding: 18px;
-        border: 1px solid var(--ins-line-strong);
-        border-radius: 12px;
-        background: rgba(27, 39, 46, 0.98);
-        box-shadow: var(--ins-shadow);
-        color: var(--ins-text);
-      }
-
-      .ins-reading-toc-heading {
-        margin-bottom: 10px;
-        color: var(--ins-pink);
-        font-size: 12px;
-        font-weight: 700;
+        padding: 12px 16px;
+        border: 0;
+        border-radius: 0;
+        background: var(--ins-bg);
+        box-shadow: none;
+        color: var(--ins-muted);
       }
 
       .ins-reading-toc-panel a {
         display: block;
         padding: 10px 4px;
-        color: var(--ins-muted);
+        color: inherit;
         font-size: 13px;
         line-height: 1.6;
         overflow-wrap: anywhere;
@@ -283,7 +255,8 @@ export const ArticleDetailStyle = () => {
       }
 
       .ins-reading-toc-panel a:hover {
-        color: var(--ins-pink);
+        text-decoration: underline;
+        text-underline-offset: 4px;
       }
 
       .ins-notion-content h1,
@@ -297,35 +270,10 @@ export const ArticleDetailStyle = () => {
         scroll-margin-top: 32px;
       }
 
-      @media (max-width: 1199px) {
+      /* Below wide-desktop widths there is no right-side TOC or reserved gutter. */
+      @media (max-width: 1399px) {
         .ins-reading-toc {
-          left: auto;
-          right: 16px;
-        }
-      }
-
-      @media (max-width: 980px) {
-        #theme-insignificantia .ins-article-safe-frame {
-          width: calc(100% - 100px) !important;
-          margin-left: 20px !important;
-          margin-right: 80px !important;
-        }
-
-        .ins-reading-toc {
-          width: 40px;
-          right: 14px;
-        }
-
-        .ins-reading-toc-trigger {
-          width: 40px;
-          min-height: 160px;
-          padding: 12px 8px;
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .ins-reading-toc-trigger {
-          transition: none;
+          display: none;
         }
       }
 

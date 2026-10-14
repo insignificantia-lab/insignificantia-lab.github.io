@@ -179,21 +179,30 @@ export const Style = () => {
         transform: rotate(-45deg);
       }
 
-      .ins-mobile-menu {
+      .ins-site-header .ins-mobile-menu {
         display: none;
         position: absolute;
-        left: 0;
-        right: 0;
-        top: 70px;
-        background: #1d2a32;
-        border-top: 1px solid var(--ins-line);
-        border-bottom: 1px solid var(--ins-line);
-        padding: 10px 20px 18px;
-        box-shadow: 0 16px 28px rgba(5, 12, 16, 0.22);
+        top: 100%;
+        left: auto;
+        right: 20px;
+        bottom: auto;
+        width: min(240px, calc(100% - 40px));
+        height: auto;
+        min-height: 0;
+        max-height: calc(100vh - 100px);
+        max-height: calc(100dvh - 100px);
+        overflow-y: auto;
+        background: var(--ins-bg);
+        border: 1px solid var(--ins-line);
+        border-radius: var(--ins-radius);
+        padding: 10px 20px;
+        box-shadow: var(--ins-shadow-soft);
       }
 
-      .ins-mobile-menu.open {
-        display: block;
+      @media (max-width: 760px) {
+        .ins-site-header .ins-mobile-menu[data-open="true"] {
+          display: block;
+        }
       }
 
       .ins-mobile-menu a {
