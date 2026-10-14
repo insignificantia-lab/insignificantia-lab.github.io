@@ -77,6 +77,13 @@ export const ArticleDetailStyle = () => {
         line-height: 2;
       }
 
+      /* Paragraph gap: 3px padding + 1px margin on each side = 8px.
+       * Add 4px before consecutive body paragraphs for a 50% increase. */
+      .ins-notion-content .notion-page-content > .notion-text + .notion-text,
+      .ins-notion-content .notion-page-content-inner > .notion-text + .notion-text {
+        margin-top: 5px !important;
+      }
+
       .ins-notion-content h1,
       .ins-notion-content .notion-h1 {
         margin: 2.2em 0 0.82em;
