@@ -25,10 +25,10 @@ jobs:
     - name: Read fixed stable source
       uses: actions/checkout@v4
       with:
-        ref: 214ba910c402cd9af73073edeec8beb38bdc35ac
+        ref: e8d663e6d74c79c6a09e8a483199f96ea122b3e5
         persist-credentials: false
     - name: Check source and required secret
-      run: "test \"$(git rev-parse HEAD)\" = \"214ba910c402cd9af73073edeec8beb38bdc35ac\"\nif [ -z \"$NOTION_PAGE_ID\" ];\
+      run: "test \"$(git rev-parse HEAD)\" = \"e8d663e6d74c79c6a09e8a483199f96ea122b3e5\"\nif [ -z \"$NOTION_PAGE_ID\" ];\
         \ then\n  echo 'Missing Published database secret; stop before using the default demo database.'\n  exit 1\nfi\necho\
         \ \"MIGRATION_ROOT=$RUNNER_TEMP/insignificantia-personal-migration\" >> \"$GITHUB_ENV\"\nmkdir -p \"$RUNNER_TEMP/insignificantia-personal-migration\"\
         \ngit archive HEAD | tar -x -C \"$RUNNER_TEMP/insignificantia-personal-migration\""
@@ -54,7 +54,7 @@ jobs:
         \ RSS API imports')\ns = s.replace(old, old + \"\\nimport { siteConfig } from '@/lib/config'\", 1)\nold = '  const\
         \ LINK = siteInfo?.link || BLOG.LINK'\nif s.count(old) != 1:\n    raise SystemExit('Unexpected RSS API LINK configuration')\n\
         s = s.replace(old, new, 1)\nrss_api.write_text(s)\nmanifest = {'version': 2, 'source_repository': 'insignificantia-lab/insignificantia-lab.github.io',\
-        \ 'source_commit': '214ba910c402cd9af73073edeec8beb38bdc35ac', 'production_repository': 'takedaiori/takedaiori.github.io',\
+        \ 'source_commit': 'e8d663e6d74c79c6a09e8a483199f96ea122b3e5', 'production_repository': 'takedaiori/takedaiori.github.io',\
         \ 'production_url': 'https://takedaiori.github.io', 'changes': ['Deployment URL takes precedence over Notion LINK',\
         \ 'Static and API RSS use the same deployment URL', 'RSS uses an empty subpath when none is configured', 'Explicit\
         \ production URL in deployment workflow', 'Fail before export if Published database secret is absent']}\n(p / 'MIGRATION-BASELINE.json').write_text(json.dumps(manifest,\
