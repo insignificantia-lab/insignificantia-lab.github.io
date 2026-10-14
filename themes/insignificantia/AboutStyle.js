@@ -32,14 +32,22 @@ export const AboutStyle = () => {
         transition:
           transform 180ms ease,
           color 180ms ease,
+          background-color 180ms ease,
           border-color 180ms ease;
       }
 
-      .ins-social-link:hover {
+      .ins-social-link:hover,
+      .ins-social-link:focus-visible {
         transform: translateY(-2px);
-        color: var(--ins-pink) !important;
-        border-color: rgba(237, 142, 172, 0.6);
+        color: var(--ins-surface) !important;
+        background: var(--ins-text);
+        border-color: var(--ins-text);
         text-decoration: none !important;
+      }
+
+      .ins-social-link:focus-visible {
+        outline: 2px solid var(--ins-pink);
+        outline-offset: 4px;
       }
 
       .ins-social-link svg {
@@ -239,3 +247,4 @@ export const AboutStyle = () => {
     `}</style>
   )
 }
+
