@@ -42,6 +42,17 @@ const SOCIALS = [
     )
   },
   {
+    name: 'Medium',
+    href: 'https://medium.com/',
+    icon: (
+      <>
+        <circle cx='6.5' cy='12' r='6.5' />
+        <ellipse cx='17' cy='12' rx='3.25' ry='6' />
+        <ellipse cx='22.5' cy='12' rx='1.5' ry='5.25' />
+      </>
+    )
+  },
+  {
     name: 'WordPress',
     href: 'https://wordpress.com/',
     icon: (
