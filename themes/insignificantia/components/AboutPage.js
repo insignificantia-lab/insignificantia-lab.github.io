@@ -58,21 +58,68 @@ const SOCIALS = [
   }
 ]
 
-const PORTFOLIO_IMAGES = [
-  '/images/insignificantia/portfolio/work-01.webp',
-  '/images/insignificantia/portfolio/work-02.webp',
-  '/images/insignificantia/portfolio/work-03.webp'
+const PORTFOLIO = [
+  {
+    id: 1,
+    title: "Senua's Saga: Hellblade II",
+    src: '/images/insignificantia/portfolio/work-01.webp'
+  },
+  {
+    id: 2,
+    title: "Mirror's Edge Catalyst",
+    src: '/images/insignificantia/portfolio/work-02.webp'
+  },
+  {
+    id: 3,
+    title: 'Call of Duty: Modern Warfare 2019',
+    src: '/images/insignificantia/portfolio/work-03.webp'
+  },
+  {
+    id: 4,
+    title: "Marvel's Spider-Man",
+    src: '/images/insignificantia/portfolio/work-04.webp'
+  },
+  {
+    id: 5,
+    title: 'CONTROL',
+    src: '/images/insignificantia/portfolio/work-05.webp'
+  },
+  {
+    id: 6,
+    title: 'The Last of Us Part II',
+    src: '/images/insignificantia/portfolio/work-06.webp'
+  },
+  {
+    id: 7,
+    title: 'DRIVECLUB BIKES',
+    src: '/images/insignificantia/portfolio/work-07.webp'
+  },
+  {
+    id: 8,
+    title: 'DIRT 5',
+    src: '/images/insignificantia/portfolio/work-08.webp'
+  },
+  {
+    id: 9,
+    title: 'MotoGP 22',
+    src: '/images/insignificantia/portfolio/work-09.webp'
+  },
+  {
+    id: 10,
+    title: 'Black Myth Wukong',
+    src: '/images/insignificantia/portfolio/work-10.webp'
+  },
+  {
+    id: 11,
+    title: 'DEATH STRANDING',
+    src: '/images/insignificantia/portfolio/work-11.webp'
+  },
+  {
+    id: 12,
+    title: 'SCARLET NEXUS',
+    src: '/images/insignificantia/portfolio/work-12.webp'
+  }
 ]
-
-const PORTFOLIO = Array.from(
-  { length: 12 },
-  (_, index) => ({
-    id: index + 1,
-    title: `作品 ${String(index + 1).padStart(2, '0')}`,
-    description: '这里预留一段简短的作品介绍文字。',
-    src: PORTFOLIO_IMAGES[index] || ''
-  })
-)
 
 const AboutPage = () => {
   const [lightbox, setLightbox] = useState(null)
@@ -149,7 +196,9 @@ const AboutPage = () => {
                 )}
               </button>
 
-              <p>{item.description}</p>
+              <p>
+                <strong>{item.title}</strong>
+              </p>
             </article>
           ))}
         </div>
@@ -200,7 +249,9 @@ const AboutPage = () => {
               )}
             </div>
 
-            <p>{lightbox.description}</p>
+            <p>
+              <strong>{lightbox.title}</strong>
+            </p>
           </div>
         </div>
       )}
