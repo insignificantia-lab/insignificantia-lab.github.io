@@ -18,7 +18,7 @@ describe('generateRss', () => {
     jest.clearAllMocks()
     jest.spyOn(fs, 'statSync').mockImplementation(() => { throw new Error('ENOENT') })
     jest.spyOn(fs, 'mkdirSync').mockImplementation(() => {})
-    jest.spyOn(fs, 'writeFileSync').mockImplementation(() => {})
+    jest.spyOn(fs.promises, 'writeFile').mockResolvedValue(undefined)
   })
   afterEach(() => { jest.restoreAllMocks() })
 
@@ -41,7 +41,7 @@ describe('generateRss', () => {
     expect(getRssPosts([posts[0]])).toEqual([posts[0]])
   })
 
-  it('uses summaries and original links even when full content is configured', () => {
+  it('uses summaries and original links even when full content is configured', async () => {
     const posts = [1, 5, 3, 4, 2].map(id => ({
       id: `post-${id}`,
       type: 'Post',
@@ -51,7 +51,7 @@ describe('generateRss', () => {
       summary: `Summary ${id}`,
       publishDay: `2026-10-0${id}`
     }))
-    generateRss({
+    await generateRss({
       NOTION_CONFIG: { AUTHOR: 'author', LANG: 'zh-CN', SUB_PATH: '', CONTACT_EMAIL: '', RSS_FULL_CONTENT: true },
       siteInfo: { title: 'site', description: 'desc', link: 'https://example.com' },
       allPages: posts,
@@ -65,7 +65,7 @@ describe('generateRss', () => {
       expect(item).not.toHaveProperty('content')
     }
     expect(getPostBlocks).not.toHaveBeenCalled()
-    expect(fs.writeFileSync).toHaveBeenCalledTimes(3)
+    expect(fs.promises.writeFile).toHaveBeenCalledTimes(3)
   })
 
   it('generates RSS only for the default locale during multi-locale builds', () => {
