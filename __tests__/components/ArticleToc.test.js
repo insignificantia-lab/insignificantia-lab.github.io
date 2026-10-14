@@ -10,10 +10,7 @@ beforeEach(() => {
   root = document.createElement('article')
   root.innerHTML = '<h2 id="' + compactId + '">First heading</h2>'
   document.body.appendChild(root)
-  Object.defineProperty(window, 'matchMedia', {
-    configurable: true,
-    value: jest.fn(() => ({ matches: false }))
-  })
+  window.matchMedia.mockReturnValue({ matches: false })
 })
 afterEach(() => {
   cleanup()
