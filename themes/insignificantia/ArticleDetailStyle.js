@@ -77,16 +77,16 @@ export const ArticleDetailStyle = () => {
         line-height: 2;
       }
 
-      /* Paragraph gap: 3px padding + 1px margin on each side = 8px.
-       * Add 4px before consecutive body paragraphs for a 50% increase. */
+      /* Double the previous 12px paragraph gap to 24px:
+       * 3px bottom padding + 1px bottom margin + 17px top margin + 3px top padding. */
       .ins-notion-content .notion-page-content > .notion-text + .notion-text,
       .ins-notion-content .notion-page-content-inner > .notion-text + .notion-text {
-        margin-top: 5px !important;
+        margin-top: 17px !important;
       }
 
       .ins-notion-content h1,
       .ins-notion-content .notion-h1 {
-        margin: 2.2em 0 0.82em;
+        margin: 1.54em 0 0.574em;
         color: var(--ins-text);
         font-family: Georgia, "Songti SC", "STSong", serif;
         font-size: 38px;
@@ -96,7 +96,7 @@ export const ArticleDetailStyle = () => {
 
       .ins-notion-content h2,
       .ins-notion-content .notion-h2 {
-        margin: 2.25em 0 0.82em;
+        margin: 1.575em 0 0.574em;
         color: var(--ins-text);
         font-family: Georgia, "Songti SC", "STSong", serif;
         font-size: 32px;
@@ -106,11 +106,17 @@ export const ArticleDetailStyle = () => {
 
       .ins-notion-content h3,
       .ins-notion-content .notion-h3 {
-        margin: 1.95em 0 0.72em;
+        margin: 1.365em 0 0.504em;
         color: var(--ins-text);
         font-family: Georgia, "Songti SC", "STSong", serif;
         font-size: 23px;
         line-height: 1.45;
+      }
+
+      /* H4 inherits 0.9em / 1px from notion.css; retain 70% of each margin. */
+      .ins-notion-content h4,
+      .ins-notion-content .notion-h4 {
+        margin: 0.63em 0 0.7px;
       }
 
       .ins-notion-content strong {
