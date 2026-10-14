@@ -1,162 +1,76 @@
 import fs from 'fs'
-import { generateRss, shouldGenerateRssForLocale } from '@/lib/utils/rss'
+import { generateRss, getRssPosts, shouldGenerateRssForLocale } from '@/lib/utils/rss'
 import { getPostBlocks } from '@/lib/db/SiteDataApi'
-import { formatNotionBlock } from '@/lib/db/notion/getPostBlocks'
-import { adapterNotionBlockMap } from '@/lib/utils/notion.util'
 
 const addItemMock = jest.fn()
-const rss2Mock = jest.fn(() => '<rss>ok</rss>')
-const atom1Mock = jest.fn(() => '<atom>ok</atom>')
-const json1Mock = jest.fn(() => '{"ok":true}')
-
 jest.mock('feed', () => ({
   Feed: jest.fn().mockImplementation(() => ({
     addItem: addItemMock,
-    rss2: rss2Mock,
-    atom1: atom1Mock,
-    json1: json1Mock
+    rss2: jest.fn(() => '<rss>ok</rss>'),
+    atom1: jest.fn(() => '<atom>ok</atom>'),
+    json1: jest.fn(() => '{"ok":true}')
   }))
 }))
-
-jest.mock('react-dom/server', () => ({
-  __esModule: true,
-  default: {
-    renderToString: jest.fn(() => '<div>rss-content</div>')
-  }
-}))
-
-jest.mock('@/components/NotionPage', () => ({
-  __esModule: true,
-  default: () => null
-}))
-
-jest.mock('@/lib/db/SiteDataApi', () => ({
-  getPostBlocks: jest.fn()
-}))
-
-jest.mock('@/lib/db/notion/getPostBlocks', () => ({
-  formatNotionBlock: jest.fn(block => block)
-}))
-
-jest.mock('@/lib/utils/notion.util', () => ({
-  adapterNotionBlockMap: jest.fn(blockMap => blockMap)
-}))
+jest.mock('@/lib/db/SiteDataApi', () => ({ getPostBlocks: jest.fn() }))
 
 describe('generateRss', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.spyOn(fs, 'statSync').mockImplementation(() => {
-      throw new Error('ENOENT')
-    })
+    jest.spyOn(fs, 'statSync').mockImplementation(() => { throw new Error('ENOENT') })
     jest.spyOn(fs, 'mkdirSync').mockImplementation(() => {})
     jest.spyOn(fs, 'writeFileSync').mockImplementation(() => {})
   })
+  afterEach(() => { jest.restoreAllMocks() })
 
-  afterEach(() => {
-    jest.restoreAllMocks()
+  it('selects the latest three published posts without changing source order', () => {
+    const posts = [1, 5, 3, 4, 2].map(id => ({
+      id,
+      type: 'Post',
+      status: 'Published',
+      publishDay: `2026-10-0${id}`,
+      lastEditedDate: id === 1 ? '2026-10-31' : '2026-10-01'
+    }))
+    posts.push(
+      { id: 6, type: 'Post', status: 'Draft', publishDay: '2026-10-30' },
+      { id: 7, type: 'Page', status: 'Published', publishDay: '2026-10-31' }
+    )
+    const original = [...posts]
+    expect(getRssPosts(posts).map(post => post.id)).toEqual([5, 4, 3])
+    expect(posts).toEqual(original)
+    expect(getRssPosts([])).toEqual([])
+    expect(getRssPosts([posts[0]])).toEqual([posts[0]])
   })
 
-  it('adapts and formats blockMap before rendering RSS content', async () => {
-    const rawBlockMap = {
-      block: {
-        x1: { id: 'x1', type: 'text' }
-      }
-    }
-    const adaptedBlockMap = {
-      block: {
-        y1: { id: 'y1', type: 'text' }
-      }
-    }
-    const formattedBlock = {
-      y1: { id: 'y1', type: 'text', properties: {} }
-    }
-
-    getPostBlocks.mockResolvedValue(rawBlockMap)
-    adapterNotionBlockMap.mockReturnValue(adaptedBlockMap)
-    formatNotionBlock.mockReturnValue(formattedBlock)
-
-    await generateRss({
-      NOTION_CONFIG: {
-        AUTHOR: 'author',
-        LANG: 'zh-CN',
-        SUB_PATH: '',
-        CONTACT_EMAIL: ''
-      },
-      siteInfo: {
-        title: 'site',
-        description: 'desc',
-        link: 'https://example.com'
-      },
-      latestPosts: [
-        {
-          id: 'post-1',
-          slug: 'hello',
-          title: 'Hello',
-          summary: 'Summary',
-          publishDay: '2026-02-18'
-        }
-      ]
+  it('uses summaries and original links even when full content is configured', () => {
+    const posts = [1, 5, 3, 4, 2].map(id => ({
+      id: `post-${id}`,
+      type: 'Post',
+      status: 'Published',
+      title: `Article ${id}`,
+      slug: `article/${id}`,
+      summary: `Summary ${id}`,
+      publishDay: `2026-10-0${id}`
+    }))
+    generateRss({
+      NOTION_CONFIG: { AUTHOR: 'author', LANG: 'zh-CN', SUB_PATH: '', CONTACT_EMAIL: '', RSS_FULL_CONTENT: true },
+      siteInfo: { title: 'site', description: 'desc', link: 'https://example.com' },
+      allPages: posts,
+      latestPosts: [posts[0]]
     })
-
-    expect(getPostBlocks).toHaveBeenCalledWith('post-1', 'rss-content')
-    expect(adapterNotionBlockMap).toHaveBeenCalledWith(rawBlockMap)
-    expect(formatNotionBlock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        y1: expect.objectContaining({ id: 'y1', type: 'text' })
-      })
-    )
-    expect(addItemMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        content: '<div>rss-content</div>'
-      })
-    )
-    expect(fs.writeFileSync).toHaveBeenCalledTimes(3)
-  })
-
-  it('uses summary without fetching blocks when RSS_FULL_CONTENT is disabled', async () => {
-    await generateRss({
-      NOTION_CONFIG: {
-        AUTHOR: 'author',
-        LANG: 'zh-CN',
-        SUB_PATH: '',
-        CONTACT_EMAIL: '',
-        RSS_FULL_CONTENT: 'false'
-      },
-      siteInfo: {
-        title: 'site',
-        description: 'desc',
-        link: 'https://example.com'
-      },
-      latestPosts: [
-        {
-          id: 'post-1',
-          slug: 'hello',
-          title: 'Hello',
-          summary: 'Summary',
-          publishDay: '2026-08-25'
-        }
-      ]
-    })
-
+    expect(addItemMock).toHaveBeenCalledTimes(3)
+    expect(addItemMock.mock.calls.map(([item]) => item.title)).toEqual(['Article 5', 'Article 4', 'Article 3'])
+    for (const [item] of addItemMock.mock.calls) {
+      expect(item.description).toMatch(/^Summary /)
+      expect(item.link).toMatch(/^https:\/\/example.com\/article\//)
+      expect(item).not.toHaveProperty('content')
+    }
     expect(getPostBlocks).not.toHaveBeenCalled()
-    expect(adapterNotionBlockMap).not.toHaveBeenCalled()
-    expect(formatNotionBlock).not.toHaveBeenCalled()
-    expect(addItemMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        description: 'Summary',
-        content: 'Summary'
-      })
-    )
     expect(fs.writeFileSync).toHaveBeenCalledTimes(3)
   })
 
   it('generates RSS only for the default locale during multi-locale builds', () => {
     expect(shouldGenerateRssForLocale({ locale: undefined })).toBe(true)
-    expect(
-      shouldGenerateRssForLocale({ locale: 'zh-CN', defaultLocale: 'zh-CN' })
-    ).toBe(true)
-    expect(
-      shouldGenerateRssForLocale({ locale: 'en', defaultLocale: 'zh-CN' })
-    ).toBe(false)
+    expect(shouldGenerateRssForLocale({ locale: 'zh-CN', defaultLocale: 'zh-CN' })).toBe(true)
+    expect(shouldGenerateRssForLocale({ locale: 'en', defaultLocale: 'zh-CN' })).toBe(false)
   })
 })
