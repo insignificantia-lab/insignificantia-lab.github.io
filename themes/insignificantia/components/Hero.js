@@ -60,7 +60,7 @@ const Hero = () => {
           </p>
           <div className='ins-hero-actions'>
             <a className='ins-btn primary' href='#posts'>
-              浏览文章 →
+              浏览文章
             </a>
             <Link className='ins-btn' href='/about'>
               关于这里

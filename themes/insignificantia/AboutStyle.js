@@ -11,6 +11,23 @@ export const AboutStyle = () => {
         margin-bottom: 34px;
       }
 
+      .ins-about-intro {
+        margin-top: 24px;
+        color: var(--ins-text-soft);
+        font-family: var(--ins-ui-font);
+        font-size: 17.5px;
+        font-weight: 700;
+        line-height: 2;
+      }
+
+      .ins-about-intro p {
+        margin: 0 0 0.65em;
+      }
+
+      .ins-about-intro p:last-child {
+        margin-bottom: 0;
+      }
+
       .ins-social-strip {
         display: flex;
         gap: 16px;
@@ -58,11 +75,6 @@ export const AboutStyle = () => {
 
       .ins-portfolio-kicker {
         margin-bottom: 30px;
-        color: var(--ins-text);
-        font-family: Georgia, "Songti SC", "STSong", serif;
-        font-size: 34px;
-        line-height: 1.3;
-        font-weight: 700;
       }
 
       .ins-portfolio-grid {
@@ -227,6 +239,11 @@ export const AboutStyle = () => {
       @media (max-width: 760px) {
         .ins-about-page {
           padding: 54px 18px 86px;
+        }
+
+        .ins-about-intro {
+          font-size: 16.5px;
+          line-height: 1.94;
         }
 
         .ins-about-header {

@@ -189,7 +189,7 @@ export const ArticleDetailStyle = () => {
 
       .ins-reading-toc-trigger {
         width: 44px;
-        height: 64px;
+        height: 108px;
         padding: 12px;
         display: flex;
         align-items: center;
@@ -211,14 +211,15 @@ export const ArticleDetailStyle = () => {
 
       .ins-reading-toc-marks {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
         gap: 5px;
       }
 
       .ins-reading-toc-marks > span {
-        width: 2px;
-        height: 28px;
+        width: 4px;
+        height: 24px;
+        border-radius: 999px;
         background: currentColor;
       }
 
@@ -248,15 +249,28 @@ export const ArticleDetailStyle = () => {
         line-height: 1.6;
         overflow-wrap: anywhere;
         text-decoration: none;
+        transition: transform 180ms ease, color 180ms ease;
       }
 
       .ins-reading-toc-panel a.is-sub {
         padding-left: 16px;
       }
 
-      .ins-reading-toc-panel a:hover {
-        text-decoration: underline;
-        text-underline-offset: 4px;
+      .ins-reading-toc-panel a:hover,
+      .ins-reading-toc-panel a:focus-visible {
+        transform: translateX(4px);
+        color: var(--ins-pink);
+        text-decoration: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ins-reading-toc-panel a {
+          transition: none;
+        }
+        .ins-reading-toc-panel a:hover,
+        .ins-reading-toc-panel a:focus-visible {
+          transform: none;
+        }
       }
 
       .ins-notion-content h1,
@@ -297,6 +311,14 @@ export const ArticleDetailStyle = () => {
         color: var(--ins-pink) !important;
         font-size: 12px;
         line-height: 1.5;
+      }
+
+      .ins-tag:hover,
+      .ins-tag:focus-visible {
+        color: var(--ins-bg) !important;
+        background: var(--ins-pink);
+        border-color: var(--ins-pink);
+        text-decoration: none !important;
       }
 
       .ins-post-nav {

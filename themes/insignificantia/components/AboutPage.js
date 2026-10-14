@@ -141,6 +141,14 @@ const AboutPage = () => {
     <main className='ins-about-page'>
       <header className='ins-about-header'>
         <div className='ins-page-kicker'>ABOUT</div>
+        <div className='ins-about-intro'>
+          <p>读者你好，我是竹田伊織，Insignificantia. 的博主。</p>
+          <p>Insignificantia. 采用NotionNext开源后端，ChatGPT负责前端开发，Github用于静态托管。</p>
+          <p>我个人感兴趣的方向是游戏摄影，模拟驾驶，游戏行业深度洞察，科技数码，智能化企业，AI，跑鞋，以及最重要的：厨艺。这些内容你几乎都可以在这个博客站点中找到。</p>
+          <p>这里的文章有的由我本人完全手打，也有AI辅助或直接参与的内容。以2025年为分界线。</p>
+          <p>下方是我的社媒链接，和游戏摄影作品集。</p>
+          <p>若内容对你有帮助，请BUY ME A COFFEE（社媒链接中的杯子图标）。谢谢你的支持！</p>
+        </div>
       </header>
 
       <section
@@ -163,9 +171,9 @@ const AboutPage = () => {
         ))}
       </section>
 
-      <section aria-label='我的视觉作品集'>
-        <div className='ins-portfolio-kicker'>
-          我的视觉作品集
+      <section aria-label='VIRTUAL PHOTOGRAPHY GALLERY'>
+        <div className='ins-portfolio-kicker ins-page-kicker'>
+          VIRTUAL PHOTOGRAPHY GALLERY
         </div>
 
         <div className='ins-portfolio-grid'>
