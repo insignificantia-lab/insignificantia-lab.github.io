@@ -34,7 +34,7 @@ it('mounts outside the page and closes on an outside press without disabling the
   document.body.appendChild(outside)
   const { container, unmount } = mount()
   const overflow = document.body.style.overflow
-  fireEvent.click(screen.getByRole('button', { name: '展开文章目录' }))
+  fireEvent.focus(screen.getByRole('link', { name: '跳转至：First heading' }))
   expect(screen.getByRole('navigation', { name: '文章目录' }).closest('aside').parentElement).toBe(document.body)
   expect(container.querySelector('aside')).toBeNull()
   fireEvent.pointerDown(outside)
@@ -46,14 +46,15 @@ it('mounts outside the page and closes on an outside press without disabling the
   outside.remove()
 })
 
-it('scrolls to the rendered heading and closes the drawer', () => {
+it('scrolls to the rendered heading and keeps the drawer open', () => {
   root.firstChild.scrollIntoView = jest.fn()
   const { unmount } = mount()
-  fireEvent.click(screen.getByRole('button', { name: '展开文章目录' }))
+  fireEvent.focus(screen.getByRole('link', { name: '跳转至：First heading' }))
   fireEvent.click(screen.getByRole('link', { name: 'First heading' }))
   expect(root.firstChild.scrollIntoView).toHaveBeenCalledWith({ block: 'start', behavior: 'smooth' })
   expect(window.location.hash).toBe('#' + compactId)
-  expect(screen.queryByRole('navigation', { name: '文章目录' })).toBeNull()
+  fireEvent.blur(screen.getByRole('link', { name: 'First heading' }), { relatedTarget: document.body })
+  expect(screen.getByRole('navigation', { name: '文章目录' })).toBeInTheDocument()
   unmount()
 })
 
@@ -61,10 +62,10 @@ it('closes with Escape and honors reduced motion for navigation', () => {
   root.firstChild.scrollIntoView = jest.fn()
   window.matchMedia.mockReturnValue({ matches: true })
   const { unmount } = mount()
-  fireEvent.click(screen.getByRole('button', { name: '展开文章目录' }))
+  fireEvent.focus(screen.getByRole('link', { name: '跳转至：First heading' }))
   fireEvent.keyDown(document, { key: 'Escape' })
   expect(screen.queryByRole('navigation', { name: '文章目录' })).toBeNull()
-  fireEvent.click(screen.getByRole('button', { name: '展开文章目录' }))
+  fireEvent.focus(screen.getByRole('link', { name: '跳转至：First heading' }))
   fireEvent.click(screen.getByRole('link', { name: 'First heading' }))
   expect(root.firstChild.scrollIntoView).toHaveBeenCalledWith({ block: 'start', behavior: 'auto' })
   unmount()
@@ -72,10 +73,10 @@ it('closes with Escape and honors reduced motion for navigation', () => {
 
 it('uses one mark per heading without visible menu labels', () => {
   const { unmount } = mount()
-  const trigger = screen.getByRole('button', { name: '展开文章目录' })
+  const trigger = screen.getByRole('link', { name: '跳转至：First heading' })
   expect(trigger.textContent).toBe('')
-  expect(trigger.querySelectorAll('.ins-reading-toc-marks > span')).toHaveLength(items.length)
-  fireEvent.click(trigger)
+  expect(document.querySelectorAll('.ins-reading-toc-mark')).toHaveLength(items.length)
+  fireEvent.focus(trigger)
   expect(screen.getByRole('navigation', { name: '文章目录' }).textContent).toBe('First heading')
   unmount()
 })
@@ -84,8 +85,36 @@ it('updates marks when heading count changes and omits empty headings', () => {
   const { rerender, unmount } = mount()
   const headings = Array.from({ length: 7 }, (_, index) => ({ id: 'heading-' + index, text: 'Heading ' + index }))
   rerender(<ArticleToc items={[...headings, { id: 'empty', text: '' }]} articleRef={{ current: root }} postId='post-two' />)
-  expect(document.querySelectorAll('.ins-reading-toc-marks > span')).toHaveLength(7)
+  expect(document.querySelectorAll('.ins-reading-toc-mark')).toHaveLength(7)
   rerender(<ArticleToc items={[]} articleRef={{ current: root }} postId='post-three' />)
   expect(document.querySelector('.ins-reading-toc')).toBeNull()
+  unmount()
+})
+
+it('makes every mark navigate to its own heading and keeps the menu open after leaving', () => {
+  const second = document.createElement('h3')
+  second.id = 'second'
+  second.textContent = 'Second heading'
+  root.appendChild(second)
+  root.firstChild.scrollIntoView = jest.fn()
+  second.scrollIntoView = jest.fn()
+  const { unmount } = render(
+    <ArticleToc items={[...items, { id: 'second', text: 'Second heading', indentLevel: 1 }]}
+      articleRef={{ current: root }} postId='post-one' />
+  )
+  fireEvent.click(screen.getByRole('link', { name: '跳转至：Second heading' }))
+  expect(second.scrollIntoView).toHaveBeenCalledWith({ block: 'start', behavior: 'smooth' })
+  expect(window.location.hash).toBe('#second')
+  const leave = new Event('pointerout', { bubbles: true })
+  Object.defineProperty(leave, 'pointerType', { value: 'mouse' })
+  Object.defineProperty(leave, 'relatedTarget', { value: document.body })
+  fireEvent(document.querySelector('.ins-reading-toc'), leave)
+  expect(screen.getByRole('navigation', { name: '文章目录' })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('link', { name: '跳转至：First heading' }))
+  expect(root.firstChild.scrollIntoView).toHaveBeenCalledTimes(1)
+  expect(window.location.hash).toBe('#' + compactId)
+  expect(screen.getByRole('navigation', { name: '文章目录' })).toBeInTheDocument()
+  fireEvent.pointerDown(document.body)
+  expect(screen.queryByRole('navigation', { name: '文章目录' })).toBeNull()
   unmount()
 })

@@ -18,19 +18,27 @@ const ArticleToc = ({ items, articleRef, postId }) => {
   const [open, setOpen] = useState(false)
   const dockRef = useRef(null)
   const triggerRef = useRef(null)
+  const pinnedRef = useRef(false)
 
   useEffect(() => { setMounted(true) }, [])
-  useEffect(() => { setOpen(false) }, [postId])
+  useEffect(() => {
+    pinnedRef.current = false
+    setOpen(false)
+  }, [postId])
 
   useEffect(() => {
     if (!open) return
     const closeOutside = event => {
-      if (!dockRef.current?.contains(event.target)) setOpen(false)
+      if (!dockRef.current?.contains(event.target)) {
+        pinnedRef.current = false
+        setOpen(false)
+      }
     }
     const closeEscape = event => {
       if (event.key === 'Escape') {
-        setOpen(false)
         if (dockRef.current?.contains(document.activeElement)) triggerRef.current?.focus()
+        pinnedRef.current = false
+        setOpen(false)
       }
     }
     document.addEventListener('pointerdown', closeOutside, true)
@@ -46,6 +54,8 @@ const ArticleToc = ({ items, articleRef, postId }) => {
 
   const jumpTo = (event, item) => {
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+    pinnedRef.current = true
+    setOpen(true)
     const id = item.id || item.blockId || item.uuid
     const root = articleRef.current
     let target = findTocTarget(root, id)
@@ -56,7 +66,6 @@ const ArticleToc = ({ items, articleRef, postId }) => {
     }
     if (!target) return
     event.preventDefault()
-    setOpen(false)
     const hash = target.id || normalizeId(id)
     if (hash) window.history.replaceState(window.history.state, '', '#' + encodeURIComponent(hash))
     target.scrollIntoView({
@@ -75,25 +84,33 @@ const ArticleToc = ({ items, articleRef, postId }) => {
         if (event.pointerType === 'mouse') setOpen(true)
       }}
       onPointerLeave={event => {
-        if (event.pointerType === 'mouse' && !dockRef.current?.contains(document.activeElement)) setOpen(false)
+        if (event.pointerType === 'mouse' && !pinnedRef.current && !dockRef.current?.contains(document.activeElement)) setOpen(false)
       }}
       onBlur={event => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+        if (!pinnedRef.current && !event.currentTarget.contains(event.relatedTarget)) setOpen(false)
       }}>
-      <button
-        ref={triggerRef}
-        type='button'
-        className='ins-reading-toc-trigger'
-        aria-label={open ? '收起文章目录' : '展开文章目录'}
-        aria-expanded={open}
-        aria-controls='ins-reading-toc-list'
-        onClick={() => setOpen(value => !value)}>
-        <span className='ins-reading-toc-marks' aria-hidden='true'>
-          {entries.map((item, index) => (
-            <span key={item.id || item.blockId || item.uuid || index} />
-          ))}
-        </span>
-      </button>
+      <div className='ins-reading-toc-trigger'>
+        <div className='ins-reading-toc-marks'>
+          {entries.map((item, index) => {
+            const id = item.id || item.blockId || item.uuid || ''
+            const title = item.text || item.title || item.value
+            return (
+              <a
+                key={id || index}
+                ref={index === 0 ? triggerRef : undefined}
+                className='ins-reading-toc-mark'
+                href={id ? '#' + normalizeId(id) : '#'}
+                aria-label={'跳转至：' + title}
+                aria-expanded={open}
+                aria-controls='ins-reading-toc-list'
+                onFocus={() => setOpen(true)}
+                onClick={event => jumpTo(event, item)}>
+                <span aria-hidden='true' />
+              </a>
+            )
+          })}
+        </div>
+      </div>
       {open && (
         <nav id='ins-reading-toc-list' className='ins-reading-toc-panel' aria-label='文章目录'>
           {entries.map((item, index) => {
