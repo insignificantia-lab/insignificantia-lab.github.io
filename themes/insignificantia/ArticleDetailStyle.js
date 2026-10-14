@@ -204,7 +204,7 @@ export const ArticleDetailStyle = () => {
         cursor: pointer;
       }
 
-      .ins-reading-toc-trigger:focus-visible,
+      .ins-reading-toc-mark:focus-visible,
       .ins-reading-toc-panel a:focus-visible {
         outline: 1px solid currentColor;
         outline-offset: 3px;
@@ -224,18 +224,36 @@ export const ArticleDetailStyle = () => {
         display: none;
       }
 
-      .ins-reading-toc-marks > span {
-        width: 4px;
+      .ins-reading-toc-mark {
+        width: 20px;
         height: 24px;
         min-height: 1px;
         max-height: 24px;
         flex: 1 1 24px;
-        border-radius: 999px;
-        background: currentColor;
-        transition: background-color 180ms ease;
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        color: inherit;
+        text-decoration: none !important;
+        cursor: pointer;
       }
 
-      .ins-reading-toc-marks > span:hover {
+      .ins-reading-toc-mark > span {
+        width: 4px;
+        height: 100%;
+        border-radius: 999px;
+        background: currentColor;
+        transform-origin: center;
+        transition: transform 180ms ease, background-color 180ms ease;
+      }
+
+      .ins-reading-toc-trigger:hover .ins-reading-toc-mark > span {
+        transform: scaleX(1.5);
+      }
+
+      .ins-reading-toc-trigger .ins-reading-toc-mark:hover > span,
+      .ins-reading-toc-trigger .ins-reading-toc-mark:focus-visible > span {
+        transform: scaleX(2);
         background: var(--ins-pink);
       }
 
@@ -295,7 +313,7 @@ export const ArticleDetailStyle = () => {
         .ins-reading-toc-panel {
           animation: none;
         }
-        .ins-reading-toc-marks > span {
+        .ins-reading-toc-mark > span {
           transition: none;
         }
         .ins-reading-toc-panel a {
