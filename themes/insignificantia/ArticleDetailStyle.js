@@ -53,6 +53,26 @@ export const ArticleDetailStyle = () => {
         font-weight: 500;
       }
 
+      /* The renderer otherwise inherits the global light-mode black palette.
+       * Scope its defaults to this fixed dark article theme so lists, toggles,
+       * to-dos and tables share the paragraph color in either system mode.
+       * Keep semantic colors (links, quotes, captions and code) independent.
+       */
+      .ins-notion-content .notion {
+        --fg-color: #d2d5cf;
+        --fg-color-0: rgba(210, 213, 207, 0.09);
+        --fg-color-1: rgba(210, 213, 207, 0.16);
+        --fg-color-2: rgba(210, 213, 207, 0.4);
+        --fg-color-3: var(--ins-muted-2);
+        --fg-color-4: var(--ins-text);
+        --fg-color-5: rgba(210, 213, 207, 0.024);
+        --fg-color-6: rgba(210, 213, 207, 0.8);
+        --fg-color-icon: var(--fg-color);
+        color: var(--fg-color);
+        font-size: inherit;
+        line-height: inherit;
+      }
+
       .ins-notion-content .notion-title,
       .ins-notion-content .notion-page-icon-wrapper {
         display: none !important;
